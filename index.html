@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSG Health - Your Mobile Clinic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS */
+        .hero {
+            background: linear-gradient(rgba(10, 46, 76, 0.8), rgba(10, 46, 76, 0.8)), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+            min-height: 80vh;
+        }
+        
+        .floating-btn {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .drug-card {
+            transition: all 0.3s ease;
+        }
+        
+        .drug-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-transition {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Hide all pages initially */
+        .page {
+            display: none;
+        }
+        
+        /* Show active page */
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-6 right-6 z-50">
+        <a href="https://wa.me/254798582435" class="floating-btn bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-green-600 transition-colors">
+            <i class="fab fa-whatsapp text-2xl"></i>
+        </a>
+    </div>
+    
+    <div class="fixed bottom-6 left-6 z-50">
+        <a href="tel:+254798582435" class="floating-btn bg-blue-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 transition-colors">
+            <i class="fas fa-phone text-xl"></i>
+        </a>
+    </div>
+    
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="fixed bottom-24 right-6 bg-blue-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:bg-blue-800 transition-colors opacity-0 invisible">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-40">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="bg-blue-600 text-white p-2 rounded-lg mr-3">
+                    <i class="fas fa-heartbeat text-xl"></i>
+                </div>
+                <a href="#" class="text-2xl font-bold text-blue-800" onclick="showPage('home')">MSG Health</a>
+            </div>
+            
+            <!-- Mobile Menu Button -->
+            <button id="mobileMenuButton" class="md:hidden text-blue-800">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-6">
+                <a href="#" class="text-blue-800 hover:text-blue-600 font-medium" onclick="showPage('home')">Home</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('about')">About</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('services')">Services</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('catalogue')">Drugs</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('contact')">Contact</a>
+                <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium" onclick="showPage('booking')">Book Appointment</a>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white py-2 px-4 shadow-lg">
+            <a href="#" class="block py-2 text-blue-800 border-b border-gray-100" onclick="showPage('home')">Home</a>
+            <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('about')">About</a>
+            <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('services')">Services</a>
+            <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('catalogue')">Drugs</a>
+            <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('contact')">Contact</a>
+            <a href="#" class="block py-2 bg-blue-600 text-white rounded-lg text-center my-2" onclick="showPage('booking')">Book Appointment</a>
+        </div>
+    </nav>
+    
+    <!-- Page Content -->
+    <div class="page-transition">
+        <!-- Home Page -->
+        <div id="home" class="page active">
+            <!-- Hero Section -->
+            <section class="hero flex items-center justify-center text-center text-white">
+                <div class="container mx-auto px-4 py-20">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-4">We Take Care of Your Health</h1>
+                    <p class="text-xl md:text-2xl mb-8">Your Mobile Clinic – Trusted Medical Services Anywhere</p>
+                    <div class="flex flex-col md:flex-row justify-center gap-4">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" onclick="showPage('services')">View Services</button>
+                        <button class="bg-white hover:bg-gray-100 text-blue-800 px-6 py-3 rounded-lg font-medium transition-colors" onclick="showPage('catalogue')">Browse Drugs</button>
+                        <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors" onclick="showPage('booking')">Book Appointment</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Features Section -->
+            <section class="py-16 bg-white">
+                <div class="container mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center text-blue-800 mb-12">Why Choose MSG Health?</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-sm text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-map-marker-alt text-blue-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-blue-800">Countrywide Coverage</h3>
+                            <p class="text-gray-600">We bring healthcare services to your doorstep, no matter where you are in the country.</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-sm text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-user-md text-blue-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-blue-800">Qualified Professionals</h3>
+                            <p class="text-gray-600">Our team consists of highly trained and experienced medical professionals.</p>
+                        </div>
+                        
+                        <div class="bg-gray-50 p-6 rounded-lg shadow-sm text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-pills text-blue-600 text-2xl"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2 text-blue-800">Comprehensive Pharmacy</h3>
+                            <p class="text-gray-600">Access to a wide range of pharmaceutical products delivered to your location.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Emergency Section -->
+            <section class="py-16 bg-blue-50">
+                <div class="container mx-auto px-4">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="md:flex">
+                            <div class="md:w-1/2 p-8 md:p-12">
+                                <h2 class="text-3xl font-bold text-blue-800 mb-4">Emergency Medical Assistance</h2>
+                                <p class="text-gray-600 mb-6">For urgent medical needs, our team is ready to respond quickly to provide the care you need.</p>
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <a href="tel:+254798582435" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors text-center">
+                                        <i class="fas fa-phone mr-2"></i> Call Now
+                                    </a>
+                                    <a href="https://wa.me/254798582435" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors text-center">
+                                        <i class="fab fa-whatsapp mr-2"></i> WhatsApp
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="md:w-1/2 bg-blue-100 flex items-center justify-center p-8">
+                                <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Emergency Assistance" class="rounded-lg max-h-64">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- About Page -->
+        <div id="about" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">About MSG Health</h1>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+                        <div>
+                            <h2 class="text-2xl font-semibold text-blue-700 mb-4">Our Mission</h2>
+                            <p class="text-gray-600 mb-6">To provide accessible, affordable, and high-quality healthcare services to individuals and families across the country through our innovative mobile clinic model.</p>
+                            
+                            <h2 class="text-2xl font-semibold text-blue-700 mb-4">Our Vision</h2>
+                            <p class="text-gray-600">To revolutionize healthcare delivery by eliminating geographical barriers and ensuring everyone has access to medical services when they need them.</p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-semibold text-blue-700 mb-4">Our Coverage</h2>
+                            <div class="bg-gray-100 rounded-lg p-4 h-64">
+                                <!-- Placeholder for map -->
+                                <div class="bg-blue-50 w-full h-full rounded flex items-center justify-center text-blue-800">
+                                    <i class="fas fa-map-marked-alt text-5xl"></i>
+                                    <p class="ml-4">Countrywide Service Coverage</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-blue-50 rounded-lg p-8 mb-12">
+                        <h2 class="text-2xl font-semibold text-blue-800 mb-6 text-center">Our Founder</h2>
+                        <div class="flex flex-col md:flex-row items-center">
+                            <div class="md:w-1/3 mb-6 md:mb-0 flex justify-center">
+                                <div class="w-48 h-48 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
+                                    <i class="fas fa-user-md text-6xl text-blue-600"></i>
+                                </div>
+                            </div>
+                            <div class="md:w-2/3 md:pl-8">
+                                <h3 class="text-xl font-semibold text-blue-700 mb-2">Dr. Geofrey Mose</h3>
+                                <p class="text-gray-600 mb-4">With over 15 years of experience in the medical field, Dr. Mose founded MSG Health to address the healthcare accessibility challenges faced by many in our communities. His vision of a mobile clinic that brings services directly to patients has transformed healthcare delivery for thousands.</p>
+                                <div class="flex flex-wrap gap-4">
+                                    <a href="mailto:mosegeofrey085@gmail.com" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                        <i class="fas fa-envelope mr-2"></i> Email
+                                    </a>
+                                    <a href="tel:+254798582435" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                        <i class="fas fa-phone mr-2"></i> Call
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Services Page -->
+        <div id="services" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">Our Services</h1>
+                    <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">We offer comprehensive medical services delivered right to your location. Here's how we can help you and your family.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Medical Attention -->
+                        <div class="service-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 transition-all duration-300">
+                            <div class="bg-blue-600 p-4 text-white">
+                                <i class="fas fa-procedures text-3xl"></i>
+                                <h3 class="text-xl font-semibold mt-2">Medical Attention</h3>
+                            </div>
+                            <div class="p-6">
+                                <p class="text-gray-600 mb-4">Immediate medical care for acute conditions, injuries, and illnesses requiring prompt attention.</p>
+                                <button onclick="showPage('booking')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Book Now</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Medical Consultation -->
+                        <div class="service-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 transition-all duration-300">
+                            <div class="bg-blue-600 p-4 text-white">
+                                <i class="fas fa-stethoscope text-3xl"></i>
+                                <h3 class="text-xl font-semibold mt-2">Medical Consultation</h3>
+                            </div>
+                            <div class="p-6">
+                                <p class="text-gray-600 mb-4">Comprehensive health assessments, diagnosis, and treatment plans from qualified physicians.</p>
+                                <button onclick="showPage('booking')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Book Now</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Therapy -->
+                        <div class="service-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 transition-all duration-300">
+                            <div class="bg-blue-600 p-4 text-white">
+                                <i class="fas fa-heartbeat text-3xl"></i>
+                                <h3 class="text-xl font-semibold mt-2">Therapy</h3>
+                            </div>
+                            <div class="p-6">
+                                <p class="text-gray-600 mb-4">Specialized therapeutic services including physiotherapy, occupational therapy, and counseling.</p>
+                                <button onclick="showPage('booking')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Book Now</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Family Physician -->
+                        <div class="service-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 transition-all duration-300">
+                            <div class="bg-blue-600 p-4 text-white">
+                                <i class="fas fa-users text-3xl"></i>
+                                <h3 class="text-xl font-semibold mt-2">Family Physician</h3>
+                            </div>
+                            <div class="p-6">
+                                <p class="text-gray-600 mb-4">Continuous and comprehensive healthcare for you and your entire family across all ages.</p>
+                                <button onclick="showPage('booking')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Book Now</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Personal Physician -->
+                        <div class="service-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 transition-all duration-300">
+                            <div class="bg-blue-600 p-4 text-white">
+                                <i class="fas fa-user-md text-3xl"></i>
+                                <h3 class="text-xl font-semibold mt-2">Personal Physician</h3>
+                            </div>
+                            <div class="p-6">
+                                <p class="text-gray-600 mb-4">Dedicated physician providing personalized healthcare tailored to your specific needs.</p>
+                                <button onclick="showPage('booking')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Book Now</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Medical Equipment Supply -->
+                        <div class="service-card bg-white rounded-lg shadow-md overflow-hidden border border-gray-100 transition-all duration-300">
+                            <div class="bg-blue-600 p-4 text-white">
+                                <i class="fas fa-medkit text-3xl"></i>
+                                <h3 class="text-xl font-semibold mt-2">Medical Equipment</h3>
+                            </div>
+                            <div class="p-6">
+                                <p class="text-gray-600 mb-4">Provision and delivery of medical equipment and supplies for home healthcare needs.</p>
+                                <button onclick="showPage('booking')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Book Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Drug Catalogue Page -->
+        <div id="catalogue" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">Pharmaceutical Products</h1>
+                    
+                    <div class="mb-8">
+                        <div class="flex flex-col md:flex-row gap-4 mb-6">
+                            <div class="relative flex-grow">
+                                <input type="text" placeholder="Search drugs..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <select class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option>All Categories</option>
+                                <option>Pain Relief</option>
+                                <option>Antibiotics</option>
+                                <option>Chronic Conditions</option>
+                                <option>Vitamins & Supplements</option>
+                                <option>First Aid</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <!-- Drug Item 1 -->
+                        <div class="drug-card bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">Paracetamol 500mg</h3>
+                            <p class="text-gray-600 text-sm mb-4">For relief of mild to moderate pain and fever. Pack of 20 tablets.</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-lg font-bold text-blue-800">KSh 150</span>
+                                <div class="flex items-center">
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                                    <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Add to Cart</button>
+                        </div>
+                        
+                        <!-- Drug Item 2 -->
+                        <div class="drug-card bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">Amoxicillin 250mg</h3>
+                            <p class="text-gray-600 text-sm mb-4">Antibiotic for bacterial infections. Capsules, pack of 12.</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-lg font-bold text-blue-800">KSh 450</span>
+                                <div class="flex items-center">
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                                    <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Add to Cart</button>
+                        </div>
+                        
+                        <!-- Drug Item 3 -->
+                        <div class="drug-card bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">Ibuprofen 200mg</h3>
+                            <p class="text-gray-600 text-sm mb-4">Anti-inflammatory for pain relief. Tablets, pack of 30.</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-lg font-bold text-blue-800">KSh 300</span>
+                                <div class="flex items-center">
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                                    <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Add to Cart</button>
+                        </div>
+                        
+                        <!-- Drug Item 4 -->
+                        <div class="drug-card bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">Vitamin C 1000mg</h3>
+                            <p class="text-gray-600 text-sm mb-4">Immune system support. Effervescent tablets, pack of 10.</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-lg font-bold text-blue-800">KSh 600</span>
+                                <div class="flex items-center">
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                                    <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Add to Cart</button>
+                        </div>
+                        
+                        <!-- Drug Item 5 -->
+                        <div class="drug-card bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">Cetirizine 10mg</h3>
+                            <p class="text-gray-600 text-sm mb-4">Antihistamine for allergy relief. Tablets, pack of 14.</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-lg font-bold text-blue-800">KSh 250</span>
+                                <div class="flex items-center">
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                                    <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Add to Cart</button>
+                        </div>
+                        
+                        <!-- Drug Item 6 -->
+                        <div class="drug-card bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">Omeprazole 20mg</h3>
+                            <p class="text-gray-600 text-sm mb-4">For acid reflux and heartburn. Capsules, pack of 14.</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-lg font-bold text-blue-800">KSh 400</span>
+                                <div class="flex items-center">
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                                    <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Add to Cart</button>
+                        </div>
+                        
+                        <!-- Drug Item 7 -->
+                        <div class="drug-card bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">Salbutamol Inhaler</h3>
+                            <p class="text-gray-600 text-sm mb-4">For asthma and COPD relief. 200 doses.</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-lg font-bold text-blue-800">KSh 800</span>
+                                <div class="flex items-center">
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                                    <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Add to Cart</button>
+                        </div>
+                        
+                        <!-- Drug Item 8 -->
+                        <div class="drug-card bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">First Aid Kit</h3>
+                            <p class="text-gray-600 text-sm mb-4">Comprehensive kit for home or travel use. 50 pieces.</p>
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-lg font-bold text-blue-800">KSh 1,500</span>
+                                <div class="flex items-center">
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                                    <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                                    <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                                </div>
+                            </div>
+                            <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Add to Cart</button>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-12 text-center">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">View Cart</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Booking Page -->
+        <div id="booking" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4 max-w-3xl">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">Book an Appointment</h1>
+                    
+                    <form id="bookingForm" class="bg-white shadow-md rounded-lg p-6 md:p-8">
+                        <div class="mb-6">
+                            <label for="service" class="block text-gray-700 font-medium mb-2">Select Service</label>
+                            <select id="service" name="service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <option value="">-- Select a service --</option>
+                                <option value="Medical Attention">Medical Attention</option>
+                                <option value="Medical Consultation">Medical Consultation</option>
+                                <option value="Therapy">Therapy</option>
+                                <option value="Family Physician">Family Physician</option>
+                                <option value="Personal Physician">Personal Physician</option>
+                                <option value="Medical Equipment">Medical Equipment</option>
+                            </select>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="date" class="block text-gray-700 font-medium mb-2">Preferred Date</label>
+                                <input type="date" id="date" name="date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label for="time" class="block text-gray-700 font-medium mb-2">Preferred Time</label>
+                                <input type="time" id="time" name="time" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="location" class="block text-gray-700 font-medium mb-2">Location</label>
+                            <input type="text" id="location" name="location" placeholder="Your address or preferred location" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="notes" class="block text-gray-700 font-medium mb-2">Additional Notes</label>
+                            <textarea id="notes" name="notes" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Any special requirements or details about your condition"></textarea>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold text-blue-800 mb-4">Your Information</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label for="name" class="block text-gray-700 font-medium mb-2">Full Name</label>
+                                <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label for="phone" class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                                <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <label for="email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                            <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        
+                        <div class="flex justify-center">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">Submit Booking</button>
+                        </div>
+                    </form>
+                    
+                    <div id="bookingSuccess" class="hidden mt-8 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                        <strong class="font-bold">Success!</strong>
+                        <span class="block sm:inline"> Your appointment has been booked. We'll contact you shortly to confirm.</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Contact Page -->
+        <div id="contact" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">Contact Us</h1>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <div>
+                            <h2 class="text-2xl font-semibold text-blue-700 mb-6">Get in Touch</h2>
+                            <p class="text-gray-600 mb-8">Have questions or need assistance? Reach out to our team and we'll respond as quickly as possible.</p>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-start">
+                                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                        <i class="fas fa-map-marker-alt text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-blue-800">Location</h3>
+                                        <p class="text-gray-600">Countrywide Mobile Service</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                        <i class="fas fa-phone text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-blue-800">Phone</h3>
+                                        <p class="text-gray-600">+254 798 582 435</p>
+                                        <a href="tel:+254798582435" class="text-blue-600 hover:underline">Call Now</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                        <i class="fas fa-envelope text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-blue-800">Email</h3>
+                                        <p class="text-gray-600">mosegeofrey085@gmail.com</p>
+                                        <a href="mailto:mosegeofrey085@gmail.com" class="text-blue-600 hover:underline">Send Email</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                    <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                        <i class="fab fa-whatsapp text-blue-600"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-semibold text-blue-800">WhatsApp</h3>
+                                        <p class="text-gray-600">+254 798 582 435</p>
+                                        <a href="https://wa.me/254798582435" class="text-blue-600 hover:underline">Message Us</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-semibold text-blue-700 mb-6">Send Us a Message</h2>
+                            <form id="contactForm" class="space-y-6">
+                                <div>
+                                    <label for="contactName" class="block text-gray-700 font-medium mb-2">Your Name</label>
+                                    <input type="text" id="contactName" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="contactEmail" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                                    <input type="email" id="contactEmail" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                
+                                <div>
+                                    <label for="contactPhone" class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                                    <input type="tel" id="contactPhone" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                                
+                                <div>
+                                    <label for="contactMessage" class="block text-gray-700 font-medium mb-2">Message</label>
+                                    <textarea id="contactMessage" name="message" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                                </div>
+                                
+                                <div>
+                                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors w-full">Send Message</button>
+                                </div>
+                            </form>
+                            
+                            <div id="contactSuccess" class="hidden mt-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                                <strong class="font-bold">Thank you!</strong>
+                                <span class="block sm:inline"> Your message has been sent successfully.</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-16 bg-gray-100 rounded-lg overflow-hidden">
+                        <!-- Placeholder for map -->
+                        <div class="h-64 bg-blue-50 flex items-center justify-center text-blue-800">
+                            <i class="fas fa-map-marked-alt text-5xl"></i>
+                            <p class="ml-4 text-xl">Countrywide Service Coverage</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-blue-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">MSG Health</h3>
+                    <p class="mb-4">Your Mobile Clinic – bringing trusted medical services to your location.</p>
+                    <p>"We Take Care of Your Health"</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:underline" onclick="showPage('home')">Home</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('about')">About Us</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('services')">Services</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('catalogue')">Drug Catalogue</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('contact')">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Services</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:underline" onclick="showPage('services')">Medical Attention</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('services')">Medical Consultation</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('services')">Therapy</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('services')">Family Physician</a></li>
+                        <li><a href="#" class="hover:underline" onclick="showPage('services')">Medical Equipment</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Contact Info</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2"></i>
+                            <a href="tel:+254798582435">+254 798 582 435</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2"></i>
+                            <a href="mailto:mosegeofrey085@gmail.com">mosegeofrey085@gmail.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fab fa-whatsapp mr-2"></i>
+                            <a href="https://wa.me/254798582435">WhatsApp</a>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-4 flex space-x-4">
+                        <a href="#" class="bg-blue-700 hover:bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="bg-blue-700 hover:bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="bg-blue-700 hover:bg-blue-600 w-10 h-10 rounded-full flex items-center justify-center">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-blue-700 mt-12 pt-8 text-center">
+                <p>&copy; 2025 MSG Health - Your Mobile Clinic. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuButton').addEventListener('click', function() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        });
+        
+        // Page navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // Close mobile menu if open
+            document.getElementById('mobileMenu').classList.add('hidden');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+        
+        // Scroll to top button
+        window.addEventListener('scroll', function() {
+            const scrollToTopButton = document.getElementById('scrollToTop');
+            if (window.pageYOffset > 300) {
+                scrollToTopButton.classList.remove('opacity-0', 'invisible');
+                scrollToTopButton.classList.add('opacity-100', 'visible');
+            } else {
+                scrollToTopButton.classList.remove('opacity-100', 'visible');
+                scrollToTopButton.classList.add('opacity-0', 'invisible');
+            }
+        });
+        
+        document.getElementById('scrollToTop').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Form submissions (simulated)
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulate form submission
+            setTimeout(() => {
+                document.getElementById('bookingSuccess').classList.remove('hidden');
+                this.reset();
+                
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    document.getElementById('bookingSuccess').classList.add('hidden');
+                }, 5000);
+            }, 1000);
+        });
+        
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulate form submission
+            setTimeout(() => {
+                document.getElementById('contactSuccess').classList.remove('hidden');
+                this.reset();
+                
+                // Hide success message after 5 seconds
+                setTimeout(() => {
+                    document.getElementById('contactSuccess').classList.add('hidden');
+                }, 5000);
+            }, 1000);
+        });
+        
+        // Drug quantity controls
+        document.querySelectorAll('.drug-card').forEach(card => {
+            const minusBtn = card.querySelector('button:first-of-type');
+            const plusBtn = card.querySelector('button:last-of-type');
+            const quantitySpan = card.querySelector('span');
+            
+            minusBtn.addEventListener('click', function() {
+                let quantity = parseInt(quantitySpan.textContent);
+                if (quantity > 1) {
+                    quantitySpan.textContent = quantity - 1;
+                }
+            });
+            
+            plusBtn.addEventListener('click', function() {
+                let quantity = parseInt(quantitySpan.textContent);
+                quantitySpan.textContent = quantity + 1;
+            });
+        });
+    </script>
+</body>
+</html>
