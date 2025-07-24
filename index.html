@@ -96,11 +96,14 @@
             </button>
             
             <!-- Desktop Menu -->
+            <!-- Desktop Menu -->
             <div class="hidden md:flex space-x-6">
                 <a href="#" class="text-blue-800 hover:text-blue-600 font-medium" onclick="showPage('home')">Home</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('about')">About</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('services')">Services</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('catalogue')">Equipment</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('feedback')">Feedback</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('careers')">Careers</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('contact')">Contact</a>
                 <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium" onclick="showPage('booking')">Book Appointment</a>
             </div>
@@ -112,6 +115,8 @@
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('about')">About</a>
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('services')">Services</a>
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('catalogue')">Equipment</a>
+            <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('feedback')">Feedback</a>
+            <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('careers')">Careers</a>
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('contact')">Contact</a>
             <a href="#" class="block py-2 bg-blue-600 text-white rounded-lg text-center my-2" onclick="showPage('booking')">Book Appointment</a>
         </div>
@@ -232,7 +237,7 @@
                                 <h3 class="text-xl font-semibold text-blue-700 mb-2">Dr. Geofrey Mose</h3>
                                 <p class="text-gray-600 mb-4">With over 15 years of experience in the medical field, Dr. Mose founded NSG Health to address the healthcare accessibility challenges faced by many in our communities. His vision of a mobile clinic that brings services directly to patients has transformed healthcare delivery for thousands.</p>
                                 <div class="flex flex-wrap gap-4">
-                                    <a href="mailto:mosegeofrey085@gmail.com" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                                    <a href="mailto:docnsghealth@gmail.com" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                                         <i class="fas fa-envelope mr-2"></i> Email
                                     </a>
                                     <a href="tel:+254798582435" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
@@ -940,7 +945,314 @@
                 </div>
             </section>
         </div>
+
+        <!-- Feedback Page -->
+        <div id="feedback" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4 max-w-4xl">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">We Value Your Feedback</h1>
+                    <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">Your feedback helps us improve our services and provide better healthcare solutions. Share your experience with NSG Health.</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        <!-- Feedback Form -->
+                        <div>
+                            <div class="bg-white shadow-md rounded-lg p-6 md:p-8">
+                                <h2 class="text-2xl font-semibold text-blue-700 mb-6">Share Your Experience</h2>
+                                
+                                <form id="feedbackForm">
+                                    <div class="mb-6">
+                                        <label for="feedbackName" class="block text-gray-700 font-medium mb-2">Your Name</label>
+                                        <input type="text" id="feedbackName" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    </div>
+                                    
+                                    <div class="mb-6">
+                                        <label for="feedbackEmail" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                                        <input type="email" id="feedbackEmail" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    </div>
+                                    
+                                    <div class="mb-6">
+                                        <label for="serviceUsed" class="block text-gray-700 font-medium mb-2">Service Used</label>
+                                        <select id="serviceUsed" name="service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                            <option value="">-- Select Service --</option>
+                                            <option value="Medical Attention">Medical Attention</option>
+                                            <option value="Medical Consultation">Medical Consultation</option>
+                                            <option value="Therapy">Therapy</option>
+                                            <option value="Family Physician">Family Physician</option>
+                                            <option value="Personal Physician">Personal Physician</option>
+                                            <option value="Medical Supplies">Medical Supplies</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-6">
+                                        <label for="rating" class="block text-gray-700 font-medium mb-2">Overall Rating</label>
+                                        <div class="flex space-x-2">
+                                            <button type="button" class="star-rating w-8 h-8 text-gray-400 hover:text-yellow-400 transition-colors" data-rating="1">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                            <button type="button" class="star-rating w-8 h-8 text-gray-400 hover:text-yellow-400 transition-colors" data-rating="2">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                            <button type="button" class="star-rating w-8 h-8 text-gray-400 hover:text-yellow-400 transition-colors" data-rating="3">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                            <button type="button" class="star-rating w-8 h-8 text-gray-400 hover:text-yellow-400 transition-colors" data-rating="4">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                            <button type="button" class="star-rating w-8 h-8 text-gray-400 hover:text-yellow-400 transition-colors" data-rating="5">
+                                                <i class="fas fa-star"></i>
+                                            </button>
+                                        </div>
+                                        <input type="hidden" id="ratingValue" name="rating" value="">
+                                    </div>
+                                    
+                                    <div class="mb-6">
+                                        <label for="feedbackMessage" class="block text-gray-700 font-medium mb-2">Your Feedback</label>
+                                        <textarea id="feedbackMessage" name="message" rows="5" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Tell us about your experience with NSG Health..." required></textarea>
+                                    </div>
+                                    
+                                    <div class="mb-6">
+                                        <label for="suggestions" class="block text-gray-700 font-medium mb-2">Suggestions for Improvement (Optional)</label>
+                                        <textarea id="suggestions" name="suggestions" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="How can we serve you better?"></textarea>
+                                    </div>
+                                    
+                                    <div class="flex justify-center">
+                                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">Submit Feedback</button>
+                                    </div>
+                                </form>
+                                
+                                <div id="feedbackSuccess" class="hidden mt-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                                    <strong class="font-bold">Thank you!</strong>
+                                    <span class="block sm:inline"> Your feedback has been submitted successfully.</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Feedback Info -->
+                        <div>
+                            <div class="bg-blue-50 rounded-lg p-6 md:p-8 mb-8">
+                                <h3 class="text-xl font-semibold text-blue-800 mb-4">Why Your Feedback Matters</h3>
+                                <ul class="space-y-3 text-gray-700">
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-blue-600 mr-3 mt-1"></i>
+                                        <span>Helps us improve our mobile clinic services</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-blue-600 mr-3 mt-1"></i>
+                                        <span>Ensures we meet your healthcare needs better</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-blue-600 mr-3 mt-1"></i>
+                                        <span>Guides our team training and development</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fas fa-check-circle text-blue-600 mr-3 mt-1"></i>
+                                        <span>Shapes our future service offerings</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-white border border-gray-200 rounded-lg p-6">
+                                <h3 class="text-xl font-semibold text-blue-800 mb-4">Quick Feedback Options</h3>
+                                <div class="space-y-4">
+                                    <a href="mailto:docnsghealth@gmail.com?subject=Quick Feedback - Excellent Service" class="block bg-green-100 hover:bg-green-200 p-4 rounded-lg border border-green-300 transition-colors">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-smile text-green-600 text-2xl mr-3"></i>
+                                            <div>
+                                                <h4 class="font-semibold text-green-800">Excellent Service</h4>
+                                                <p class="text-green-700 text-sm">Click to send positive feedback</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    
+                                    <a href="mailto:docnsghealth@gmail.com?subject=Feedback - Good Service" class="block bg-blue-100 hover:bg-blue-200 p-4 rounded-lg border border-blue-300 transition-colors">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-thumbs-up text-blue-600 text-2xl mr-3"></i>
+                                            <div>
+                                                <h4 class="font-semibold text-blue-800">Good Service</h4>
+                                                <p class="text-blue-700 text-sm">Share your positive experience</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    
+                                    <a href="mailto:docnsghealth@gmail.com?subject=Feedback - Suggestions for Improvement" class="block bg-yellow-100 hover:bg-yellow-200 p-4 rounded-lg border border-yellow-300 transition-colors">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-lightbulb text-yellow-600 text-2xl mr-3"></i>
+                                            <div>
+                                                <h4 class="font-semibold text-yellow-800">Suggestions</h4>
+                                                <p class="text-yellow-700 text-sm">Help us improve our services</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
         
+        <!-- Careers Page -->
+        <div id="careers" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">Join Our Team</h1>
+                    <p class="text-gray-600 text-center max-w-3xl mx-auto mb-12">Be part of revolutionizing healthcare delivery in Kenya. We're looking for passionate healthcare professionals to join our mobile clinic team and make a difference in communities across the country.</p>
+                    
+                    <!-- Remote Work Benefits -->
+                    <div class="bg-blue-50 rounded-lg p-8 mb-12">
+                        <h2 class="text-2xl font-semibold text-blue-800 mb-6 text-center">Why Work With NSG Health?</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="text-center">
+                                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-home text-blue-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-blue-800 mb-2">Remote Flexibility</h3>
+                                <p class="text-gray-600">Work from anywhere with flexible schedules and remote opportunities.</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-heart text-blue-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-blue-800 mb-2">Make a Difference</h3>
+                                <p class="text-gray-600">Impact lives by bringing healthcare to underserved communities.</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <i class="fas fa-chart-line text-blue-600 text-2xl"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-blue-800 mb-2">Career Growth</h3>
+                                <p class="text-gray-600">Opportunities for professional development and career advancement.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Available Positions -->
+                    <div class="mb-12">
+                        <h2 class="text-2xl font-semibold text-blue-800 mb-8 text-center">Current Remote Opportunities</h2>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            
+                            <!-- Remote Medical Coordinator -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-blue-800 mb-2">Remote Medical Coordinator</h3>
+                                        <div class="flex flex-wrap gap-2 mb-3">
+                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Remote</span>
+                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">Full-time</span>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-laptop-medical text-blue-600 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-4">Coordinate mobile clinic schedules, manage patient appointments, and ensure smooth operations of our healthcare delivery system.</p>
+                                <ul class="text-gray-600 text-sm mb-4 space-y-1">
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Medical background preferred</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Strong organizational skills</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Experience with scheduling systems</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Excellent communication skills</li>
+                                </ul>
+                                <button onclick="openApplicationForm('Remote Medical Coordinator')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Apply Now</button>
+                            </div>
+                            
+                            <!-- Telemedicine Consultant -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-blue-800 mb-2">Telemedicine Consultant</h3>
+                                        <div class="flex flex-wrap gap-2 mb-3">
+                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Remote</span>
+                                            <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-sm">Part-time</span>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-video text-blue-600 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-4">Provide remote medical consultations, support field teams, and offer expert medical advice through digital platforms.</p>
+                                <ul class="text-gray-600 text-sm mb-4 space-y-1">
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Licensed medical practitioner</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Telemedicine experience preferred</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Tech-savvy with digital tools</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Flexible availability</li>
+                                </ul>
+                                <button onclick="openApplicationForm('Telemedicine Consultant')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Apply Now</button>
+                            </div>
+                            
+                            <!-- Digital Health Educator -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-blue-800 mb-2">Digital Health Educator</h3>
+                                        <div class="flex flex-wrap gap-2 mb-3">
+                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Remote</span>
+                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">Full-time</span>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-chalkboard-teacher text-blue-600 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-4">Create health education content, conduct virtual health workshops, and develop community health programs for our mobile clinic outreach.</p>
+                                <ul class="text-gray-600 text-sm mb-4 space-y-1">
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Health education background</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Content creation skills</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Public speaking experience</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Community outreach passion</li>
+                                </ul>
+                                <button onclick="openApplicationForm('Digital Health Educator')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Apply Now</button>
+                            </div>
+                            
+                            <!-- Customer Support Specialist -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                                <div class="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 class="text-xl font-semibold text-blue-800 mb-2">Customer Support Specialist</h3>
+                                        <div class="flex flex-wrap gap-2 mb-3">
+                                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">Remote</span>
+                                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">Full-time</span>
+                                        </div>
+                                    </div>
+                                    <i class="fas fa-headset text-blue-600 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-4">Provide excellent customer service, handle inquiries, manage bookings, and support patients through their healthcare journey with NSG Health.</p>
+                                <ul class="text-gray-600 text-sm mb-4 space-y-1">
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Customer service experience</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Strong communication skills</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Healthcare knowledge helpful</li>
+                                    <li class="flex items-center"><i class="fas fa-check text-green-600 mr-2"></i> Problem-solving abilities</li>
+                                </ul>
+                                <button onclick="openApplicationForm('Customer Support Specialist')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Apply Now</button>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <!-- Application Process -->
+                    <div class="bg-gray-50 rounded-lg p-8">
+                        <h2 class="text-2xl font-semibold text-blue-800 mb-6 text-center">Application Process</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="text-center">
+                                <div class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-lg">1</div>
+                                <h3 class="font-semibold text-blue-800 mb-2">Apply Online</h3>
+                                <p class="text-gray-600 text-sm">Submit your application through our form</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-lg">2</div>
+                                <h3 class="font-semibold text-blue-800 mb-2">Initial Review</h3>
+                                <p class="text-gray-600 text-sm">We review your qualifications and experience</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-lg">3</div>
+                                <h3 class="font-semibold text-blue-800 mb-2">Interview</h3>
+                                <p class="text-gray-600 text-sm">Virtual interview with our team</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-lg">4</div>
+                                <h3 class="font-semibold text-blue-800 mb-2">Welcome Aboard</h3>
+                                <p class="text-gray-600 text-sm">Onboarding and start your journey</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
         <!-- Contact Page -->
         <div id="contact" class="page">
             <section class="py-12 bg-white">
@@ -980,8 +1292,8 @@
                                     </div>
                                     <div>
                                         <h3 class="font-semibold text-blue-800">Email</h3>
-                                        <p class="text-gray-600">mosegeofrey085@gmail.com</p>
-                                        <a href="mailto:mosegeofrey085@gmail.com" class="text-blue-600 hover:underline">Send Email</a>
+                                        <p class="text-gray-600">docnsghealth@gmail.com</p>
+                                        <a href="mailto:docnsghealth@gmail.com" class="text-blue-600 hover:underline">Send Email</a>
                                     </div>
                                 </div>
                                 
@@ -1046,25 +1358,27 @@
     </div>
     
     <!-- Footer -->
-    <footer class="bg-blue-800 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4">NSG Health</h3>
-                    <p class="mb-4">Your Mobile Clinic – bringing trusted medical services to your location.</p>
-                    <p>"We Take Care of Your Health"</p>
-                </div>
-                
-                <div>
-                    <h3 class="text-xl font-bold mb-4">Quick Links</h3>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="hover:underline" onclick="showPage('home')">Home</a></li>
-                        <li><a href="#" class="hover:underline" onclick="showPage('about')">About Us</a></li>
-                        <li><a href="#" class="hover:underline" onclick="showPage('services')">Services</a></li>
-                        <li><a href="#" class="hover:underline" onclick="showPage('catalogue')">Medical Supplies</a></li>
-                        <li><a href="#" class="hover:underline" onclick="showPage('contact')">Contact</a></li>
-                    </ul>
-                </div>
+    <<footer class="bg-blue-800 text-white py-12">
+            <div class="container mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">NSG Health</h3>
+                        <p class="mb-4">Your Mobile Clinic – bringing trusted medical services to your location.</p>
+                        <p>"We Take Care of Your Health"</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="hover:underline" onclick="showPage('home')">Home</a></li>
+                            <li><a href="#" class="hover:underline" onclick="showPage('about')">About Us</a></li>
+                            <li><a href="#" class="hover:underline" onclick="showPage('services')">Services</a></li>
+                            <li><a href="#" class="hover:underline" onclick="showPage('catalogue')">Medical Supplies</a></li>
+                            <li><a href="#" class="hover:underline" onclick="showPage('feedback')">Feedback</a></li>
+                            <li><a href="#" class="hover:underline" onclick="showPage('careers')">Careers</a></li>
+                            <li><a href="#" class="hover:underline" onclick="showPage('contact')">Contact</a></li>
+                        </ul>
+                    </div>
                 
                 <div>
                     <h3 class="text-xl font-bold mb-4">Services</h3>
@@ -1086,7 +1400,7 @@
                         </li>
                         <li class="flex items-center">
                             <i class="fas fa-envelope mr-2"></i>
-                            <a href="mailto:mosegeofrey085@gmail.com">mosegeofrey085@gmail.com</a>
+                            <a href="mailto:docnsghealth@gmail.com">docnsghealth@gmail.com</a>
                         </li>
                         <li class="flex items-center">
                             <i class="fab fa-whatsapp mr-2"></i>
@@ -1157,6 +1471,154 @@
             });
         });
         
+        // Update all 'Add to Cart' buttons to use mailto
+        document.querySelectorAll('.product-card button:last-child').forEach(button => {
+            if (button.textContent.includes('Add to Cart')) {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const card = this.closest('.product-card');
+                    const productName = card.querySelector('h3').textContent;
+                    const price = card.querySelector('.text-lg.font-bold').textContent;
+                    const quantitySpan = card.querySelector('.bg-gray-100 span, .w-10');
+                    const quantity = quantitySpan ? quantitySpan.textContent : '1';
+                    const selectElement = card.querySelector('select');
+                    const variant = selectElement ? selectElement.value : 'Standard';
+                    
+                    const subject = `Product Order - ${productName}`;
+                    const body = `Dear NSG Health Team,%0D%0A%0D%0AI would like to order the following product:%0D%0A%0D%0AProduct: ${encodeURIComponent(productName)}%0D%0AVariant: ${encodeURIComponent(variant)}%0D%0AQuantity: ${quantity}%0D%0APrice: ${encodeURIComponent(price)}%0D%0A%0D%0APlease confirm availability and delivery details.%0D%0A%0D%0AThank you,%0D%0A[Your Name]%0D%0A[Your Phone]%0D%0A[Your Location]`;
+                    
+                    window.location.href = `mailto:docnsghealth@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+                });
+            }
+        });
+
+        // Form submissions (updated to use mailto)
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const service = formData.get('service');
+            const date = formData.get('date');
+            const time = formData.get('time');
+            const location = formData.get('location');
+            const notes = formData.get('notes');
+            const name = formData.get('name');
+            const phone = formData.get('phone');
+            const email = formData.get('email');
+            
+            // Create mailto URL
+            const subject = `Appointment Booking - ${service}`;
+            const body = `Dear NSG Health Team,%0D%0A%0D%0AI would like to book an appointment with the following details:%0D%0A%0D%0AService: ${service}%0D%0APreferred Date: ${date}%0D%0APreferred Time: ${time}%0D%0ALocation: ${encodeURIComponent(location)}%0D%0A%0D%0APatient Information:%0D%0AName: ${name}%0D%0APhone: ${phone}%0D%0AEmail: ${email || 'Not provided'}%0D%0A%0D%0AAdditional Notes:%0D%0A${encodeURIComponent(notes || 'None')}%0D%0A%0D%0APlease confirm this appointment at your earliest convenience.%0D%0A%0D%0AThank you,%0D%0A${name}`;
+            
+            window.location.href = `mailto:docnsghealth@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+            
+            // Show success message
+            document.getElementById('bookingSuccess').classList.remove('hidden');
+            this.reset();
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('bookingSuccess').classList.add('hidden');
+            }, 5000);
+        });
+        
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const phone = formData.get('phone');
+            const message = formData.get('message');
+            
+            // Create mailto URL
+            const subject = `Contact Form Message from ${name}`;
+            const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0APhone: ${phone || 'Not provided'}%0D%0A%0D%0AMessage:%0D%0A${encodeURIComponent(message)}`;
+            
+            window.location.href = `mailto:docnsghealth@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+            
+            // Show success message
+            document.getElementById('contactSuccess').classList.remove('hidden');
+            this.reset();
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('contactSuccess').classList.add('hidden');
+            }, 5000);
+        });
+        
+        // Feedback form submission
+        document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const name = formData.get('name');
+            const email = formData.get('email');
+            const service = formData.get('service');
+            const rating = formData.get('rating');
+            const message = formData.get('message');
+            const suggestions = formData.get('suggestions');
+            
+            // Create mailto URL with feedback data
+            const subject = `Feedback from ${name} - ${service}`;
+            const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0AService Used: ${service}%0D%0ARating: ${rating}/5 stars%0D%0A%0D%0AFeedback:%0D%0A${encodeURIComponent(message)}%0D%0A%0D%0ASuggestions:%0D%0A${encodeURIComponent(suggestions || 'None')}`;
+            
+            window.location.href = `mailto:docnsghealth@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+            
+            // Show success message
+            document.getElementById('feedbackSuccess').classList.remove('hidden');
+            this.reset();
+            
+            // Reset star rating
+            document.querySelectorAll('.star-rating').forEach(star => {
+                star.classList.remove('text-yellow-400');
+                star.classList.add('text-gray-400');
+            });
+            document.getElementById('ratingValue').value = '';
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                document.getElementById('feedbackSuccess').classList.add('hidden');
+            }, 5000);
+        });
+        
+        // Star rating functionality
+        document.querySelectorAll('.star-rating').forEach(star => {
+            star.addEventListener('click', function() {
+                const rating = parseInt(this.dataset.rating);
+                document.getElementById('ratingValue').value = rating;
+                
+                // Update star display
+                document.querySelectorAll('.star-rating').forEach((s, index) => {
+                    if (index < rating) {
+                        s.classList.remove('text-gray-400');
+                        s.classList.add('text-yellow-400');
+                    } else {
+                        s.classList.remove('text-yellow-400');
+                        s.classList.add('text-gray-400');
+                    }
+                });
+            });
+        });
+        
+        // Application form function
+        function openApplicationForm(position) {
+            const subject = `Job Application - ${position}`;
+            const body = `Dear NSG Health Team,%0D%0A%0D%0AI am interested in applying for the ${position} position. Please find my details below:%0D%0A%0D%0AName: [Your Full Name]%0D%0APhone: [Your Phone Number]%0D%0AEmail: [Your Email]%0D%0ALocation: [Your Location]%0D%0A%0D%0ARelevant Experience:%0D%0A[Please describe your relevant experience and qualifications]%0D%0A%0D%0AWhy I'm interested in this role:%0D%0A[Please explain your interest in the position and NSG Health]%0D%0A%0D%0AAvailability:%0D%0A[When can you start? What are your preferred working hours?]%0D%0A%0D%0APlease let me know the next steps in the application process.%0D%0A%0D%0AThank you for considering my application. I look forward to hearing from you.%0D%0A%0D%0ABest regards,%0D%0A[Your Name]`;
+            
+            window.location.href = `mailto:docnsghealth@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+        }
+
+        // Set minimum date for booking to today
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('date');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+            }
+        });
+
         // Form submissions (simulated)
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             e.preventDefault();
