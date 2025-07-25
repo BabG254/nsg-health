@@ -81,12 +81,11 @@
     <nav class="bg-white shadow-md sticky top-0 z-40">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center">
-                <div class="bg-red-600 text-white p-2 rounded-lg mr-3">
-                    <i class="fas fa-heartbeat text-xl"></i>
+                <div class="mr-3">
+                    <img src="/logo.jpeg" alt="NSG HEALTH Logo" class="h-12">
                 </div>
                 <div class="flex flex-col">
-                    <a href="#" class="text-2xl font-bold text-blue-800" onclick="showPage('home')">NSG Health</a>
-                    <span class="text-sm text-gray-600 -mt-1" style="font-style: italic; font-family: 'Times New Roman', serif; transform: skew(-10deg, 0deg);">Your mobile clinic</span>
+                    <span class="text-sm text-gray-600" style="font-style: italic; font-family: 'Times New Roman', serif; transform: skew(-10deg, 0deg);"></span>
                 </div>
             </div>
             
@@ -95,7 +94,6 @@
                 <i class="fas fa-bars text-2xl"></i>
             </button>
             
-            <!-- Desktop Menu -->
             <!-- Desktop Menu -->
             <div class="hidden md:flex space-x-6">
                 <a href="#" class="text-blue-800 hover:text-blue-600 font-medium" onclick="showPage('home')">Home</a>
@@ -327,7 +325,7 @@
                             </div>
                             <div class="p-6">
                                 <p class="text-gray-600 mb-4">Provision and delivery of medical supplies and equipment for healthcare facilities and home use.</p>
-                                <button onclick="showPage('booking')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Book Now</button>
+                                <button onclick="showPage('catalogue')" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition-colors">Look at Supplies</button>
                             </div>
                         </div>
                     </div>
@@ -1362,7 +1360,9 @@
             <div class="container mx-auto px-4">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div>
-                        <h3 class="text-xl font-bold mb-4">NSG Health</h3>
+                        <div class="mb-4">
+                            <img src="/logo.jpeg" alt="NSG HEALTH Logo" class="h-15">
+                        </div>
                         <p class="mb-4">Your Mobile Clinic – bringing trusted medical services to your location.</p>
                         <p>"We Take Care of Your Health"</p>
                     </div>
