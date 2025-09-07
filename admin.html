@@ -253,8 +253,12 @@
                                 <input type="number" id="equipmentPrice" name="price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                             </div>
                             <div>
-                                <label for="equipmentImage" class="block text-gray-700 font-medium mb-2">Image URL</label>
-                                <input type="url" id="equipmentImage" name="image" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://example.com/image.jpg">
+                                <label for="equipmentImage" class="block text-gray-700 font-medium mb-2">Equipment Image</label>
+                                <input type="file" id="equipmentImage" name="image" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <p class="text-sm text-gray-500 mt-1">Upload an image file (JPG, PNG, etc.)</p>
+                                <div id="equipmentImagePreview" class="mt-2 hidden">
+                                    <img id="equipmentPreviewImg" src="" alt="Preview" class="preview-image rounded border">
+                                </div>
                             </div>
                         </div>
                         <div class="flex justify-end space-x-4 mt-6">
@@ -323,8 +327,12 @@
                                 <input type="text" id="medicineManufacturer" name="manufacturer" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
                             </div>
                             <div>
-                                <label for="medicineImage" class="block text-gray-700 font-medium mb-2">Image URL</label>
-                                <input type="url" id="medicineImage" name="image" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="https://example.com/image.jpg">
+                                <label for="medicineImage" class="block text-gray-700 font-medium mb-2">Medicine Image</label>
+                                <input type="file" id="medicineImage" name="image" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <p class="text-sm text-gray-500 mt-1">Upload an image file (JPG, PNG, etc.)</p>
+                                <div id="medicineImagePreview" class="mt-2 hidden">
+                                    <img id="medicinePreviewImg" src="" alt="Preview" class="preview-image rounded border">
+                                </div>
                             </div>
                         </div>
                         <div class="flex justify-end space-x-4 mt-6">
@@ -381,8 +389,12 @@
                                 <textarea id="blogContent" name="content" rows="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required></textarea>
                             </div>
                             <div>
-                                <label for="blogImage" class="block text-gray-700 font-medium mb-2">Featured Image URL</label>
-                                <input type="url" id="blogImage" name="image" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="https://example.com/image.jpg">
+                                <label for="blogImage" class="block text-gray-700 font-medium mb-2">Featured Image</label>
+                                <input type="file" id="blogImage" name="image" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <p class="text-sm text-gray-500 mt-1">Upload a featured image for the blog post</p>
+                                <div id="blogImagePreview" class="mt-2 hidden">
+                                    <img id="blogPreviewImg" src="" alt="Preview" class="preview-image rounded border">
+                                </div>
                             </div>
                             <div>
                                 <label for="blogTags" class="block text-gray-700 font-medium mb-2">Tags (comma-separated)</label>
@@ -915,17 +927,30 @@
         }
 
         // Form submissions
-        document.getElementById('equipmentFormData').addEventListener('submit', function(e) {
+        document.getElementById('equipmentFormData').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
+            const imageFile = formData.get('image');
+            let imageData = '';
+            
+            // Handle image file upload
+            if (imageFile && imageFile.size > 0) {
+                try {
+                    imageData = await fileToBase64(imageFile);
+                } catch (error) {
+                    showNotification('Error processing image file', 'error');
+                    return;
+                }
+            }
+            
             const equipmentData_item = {
                 id: formData.get('id') || Date.now().toString(),
                 name: formData.get('name'),
                 category: formData.get('category'),
                 description: formData.get('description'),
                 price: formData.get('price'),
-                image: formData.get('image')
+                image: imageData
             };
             
             if (formData.get('id')) {
@@ -947,10 +972,23 @@
             syncToFrontend();
         });
 
-        document.getElementById('medicineFormData').addEventListener('submit', function(e) {
+        document.getElementById('medicineFormData').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
+            const imageFile = formData.get('image');
+            let imageData = '';
+            
+            // Handle image file upload
+            if (imageFile && imageFile.size > 0) {
+                try {
+                    imageData = await fileToBase64(imageFile);
+                } catch (error) {
+                    showNotification('Error processing image file', 'error');
+                    return;
+                }
+            }
+            
             const medicineItem = {
                 id: formData.get('id') || Date.now().toString(),
                 name: formData.get('name'),
@@ -959,7 +997,7 @@
                 price: formData.get('price'),
                 strength: formData.get('strength'),
                 manufacturer: formData.get('manufacturer'),
-                image: formData.get('image')
+                image: imageData
             };
             
             if (formData.get('id')) {
@@ -981,17 +1019,30 @@
             syncToFrontend();
         });
 
-        document.getElementById('blogFormData').addEventListener('submit', function(e) {
+        document.getElementById('blogFormData').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const formData = new FormData(this);
+            const imageFile = formData.get('image');
+            let imageData = '';
+            
+            // Handle image file upload
+            if (imageFile && imageFile.size > 0) {
+                try {
+                    imageData = await fileToBase64(imageFile);
+                } catch (error) {
+                    showNotification('Error processing image file', 'error');
+                    return;
+                }
+            }
+            
             const blogItem = {
                 id: formData.get('id') || Date.now().toString(),
                 title: formData.get('title'),
                 author: formData.get('author'),
                 excerpt: formData.get('excerpt'),
                 content: formData.get('content'),
-                image: formData.get('image'),
+                image: imageData,
                 tags: formData.get('tags') ? formData.get('tags').split(',').map(tag => tag.trim()) : [],
                 publishedAt: formData.get('id') ? blogData.find(b => b.id === formData.get('id')).publishedAt : new Date().toISOString()
             };
@@ -1272,7 +1323,84 @@
             
             // Set equipment count
             document.getElementById('equipmentCount').textContent = equipmentData.length;
+            
+            // Setup image preview handlers
+            setupImagePreviewHandlers();
         });
+
+        // Image preview functionality
+        function setupImagePreviewHandlers() {
+            // Equipment image preview
+            const equipmentImageInput = document.getElementById('equipmentImage');
+            const equipmentPreview = document.getElementById('equipmentImagePreview');
+            const equipmentPreviewImg = document.getElementById('equipmentPreviewImg');
+            
+            if (equipmentImageInput) {
+                equipmentImageInput.addEventListener('change', function(e) {
+                    handleImagePreview(e, equipmentPreview, equipmentPreviewImg);
+                });
+            }
+            
+            // Medicine image preview
+            const medicineImageInput = document.getElementById('medicineImage');
+            const medicinePreview = document.getElementById('medicineImagePreview');
+            const medicinePreviewImg = document.getElementById('medicinePreviewImg');
+            
+            if (medicineImageInput) {
+                medicineImageInput.addEventListener('change', function(e) {
+                    handleImagePreview(e, medicinePreview, medicinePreviewImg);
+                });
+            }
+            
+            // Blog image preview
+            const blogImageInput = document.getElementById('blogImage');
+            const blogPreview = document.getElementById('blogImagePreview');
+            const blogPreviewImg = document.getElementById('blogPreviewImg');
+            
+            if (blogImageInput) {
+                blogImageInput.addEventListener('change', function(e) {
+                    handleImagePreview(e, blogPreview, blogPreviewImg);
+                });
+            }
+        }
+
+        // Handle image preview
+        function handleImagePreview(event, previewDiv, previewImg) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                // Check if file is an image
+                if (!file.type.startsWith('image/')) {
+                    showNotification('Please select a valid image file', 'error');
+                    return;
+                }
+                
+                // Check file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    showNotification('Image size should be less than 5MB', 'error');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewDiv.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewDiv.classList.add('hidden');
+            }
+        }
+
+        // Convert file to base64 for storage
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
     </script>
 </body>
 </html>
