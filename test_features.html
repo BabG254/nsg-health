@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSG Health - Feature Test Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">NSG Health - Feature Testing Guide</h1>
+        
+        <!-- Quick Links -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4"><i class="fas fa-globe text-blue-600 mr-2"></i>Main Website</h2>
+                <p class="text-gray-600 mb-4">View the main NSG Health website with Medicine and Blogs sections</p>
+                <a href="index.html" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Open Website
+                </a>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4"><i class="fas fa-user-shield text-green-600 mr-2"></i>Admin Login</h2>
+                <p class="text-gray-600 mb-4">Access the admin panel (use demo credentials)</p>
+                <a href="login.html" target="_blank" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Admin Login
+                </a>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4"><i class="fas fa-cogs text-purple-600 mr-2"></i>Admin Panel</h2>
+                <p class="text-gray-600 mb-4">Manage content directly (login required)</p>
+                <a href="admin.html" target="_blank" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                    Admin Panel
+                </a>
+            </div>
+        </div>
+        
+        <!-- Features Overview -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-6"><i class="fas fa-star text-yellow-500 mr-2"></i>Key Features Implemented</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3">Frontend Features</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Medicine Section with Real-time Updates</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Blogs Section with Real-time Updates</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Search and Filter Functionality</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Order Medicine via Email</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Book Appointments</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Submit Feedback</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Real-time Activity Reporting to Admin</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold text-purple-800 mb-3">Admin Features</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Secure Login System</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Add/Edit/Delete Medicine</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Add/Edit/Delete Blogs</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Real-time User Activity Monitor</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Live Content Sync to Frontend</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Responsive Dashboard</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i>Session Management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Testing Steps -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-6"><i class="fas fa-clipboard-check text-blue-600 mr-2"></i>Testing Steps</h2>
+            
+            <div class="space-y-6">
+                <div class="border-l-4 border-blue-500 pl-4">
+                    <h3 class="text-lg font-semibold mb-2">Step 1: Test Real-time Communication</h3>
+                    <ol class="list-decimal list-inside space-y-1 text-gray-700">
+                        <li>Open the main website (index.html) in one tab</li>
+                        <li>Login to admin panel (login.html) in another tab using credentials below</li>
+                        <li>Add a new medicine or blog in admin panel</li>
+                        <li>Switch to main website tab - see content appear instantly</li>
+                        <li>On main website, book an appointment or order medicine</li>
+                        <li>Switch to admin panel - see user activity in real-time</li>
+                    </ol>
+                </div>
+                
+                <div class="border-l-4 border-green-500 pl-4">
+                    <h3 class="text-lg font-semibold mb-2">Step 2: Test Admin Features</h3>
+                    <ol class="list-decimal list-inside space-y-1 text-gray-700">
+                        <li>Login with: <strong>Username: admin, Password: 1a2d3m4i5n</strong></li>
+                        <li>Add multiple medicines with different categories</li>
+                        <li>Create blog posts with rich content</li>
+                        <li>Edit existing content and see changes reflect immediately</li>
+                        <li>Monitor user activities in the activity feed</li>
+                        <li>Test logout and session management</li>
+                    </ol>
+                </div>
+                
+                <div class="border-l-4 border-purple-500 pl-4">
+                    <h3 class="text-lg font-semibold mb-2">Step 3: Test User Features</h3>
+                    <ol class="list-decimal list-inside space-y-1 text-gray-700">
+                        <li>Navigate between different sections (Home, Medicine, Blogs, etc.)</li>
+                        <li>Search and filter medicines by category</li>
+                        <li>Search blogs by keywords</li>
+                        <li>Order medicines (opens email client)</li>
+                        <li>Book appointments with detailed information</li>
+                        <li>Submit feedback with star ratings</li>
+                        <li>Check mobile responsiveness</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demo Credentials -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-key text-yellow-600 mr-2"></i>Admin Credentials</h2>
+            <div class="grid md:grid-cols-1 gap-4">
+                <div>
+                    <h3 class="font-semibold">Admin Account:</h3>
+                    <p><strong>Username:</strong> admin</p>
+                    <p><strong>Password:</strong> 1a2d3m4i5n</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Technical Details -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-semibold mb-6"><i class="fas fa-code text-gray-600 mr-2"></i>Technical Implementation</h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Real-time Communication</h3>
+                    <ul class="space-y-1 text-gray-700">
+                        <li>• localStorage for data persistence</li>
+                        <li>• Storage events for cross-tab communication</li>
+                        <li>• Bidirectional sync between admin and frontend</li>
+                        <li>• Activity logging and monitoring</li>
+                        <li>• Automatic periodic updates (5-second intervals)</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Security & Data</h3>
+                    <ul class="space-y-1 text-gray-700">
+                        <li>• Session-based authentication</li>
+                        <li>• Role-based access control</li>
+                        <li>• Client-side data validation</li>
+                        <li>• Email integration for orders/appointments</li>
+                        <li>• Responsive design with Tailwind CSS</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSG Health Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-section {
+            display: none;
+        }
+        .admin-section.active {
+            display: block;
+        }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .status-online {
+            background-color: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+        .status-offline {
+            background-color: #ef4444;
+        }
+        .real-time-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Notification Container -->
+    <div id="notification" class="notification bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+        <span id="notificationText">Changes saved successfully!</span>
+    </div>
+
+    <!-- Real-time Status Indicator -->
+    <div id="realTimeStatus" class="real-time-indicator">
+        <span class="status-indicator status-online"></span>
+        Real-time sync active
+    </div>
+
+    <!-- Header -->
+    <header class="bg-blue-800 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <!-- NSG Health Logo -->
+                    <div class="relative">
+                        <svg width="35" height="30" viewBox="0 0 40 35" class="text-red-500">
+                            <path d="M20 32C20 32 3 22 3 12C3 7 7 3 12 3C15 3 18 5 20 8C22 5 25 3 28 3C33 3 37 7 37 12C37 22 20 32 20 32Z" fill="currentColor"/>
+                            <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold">NSG Health Admin</h1>
+                        <p class="text-blue-200 text-sm">Content Management System</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-blue-200" id="currentUser">Welcome, Admin</span>
+                    <button onclick="previewWebsite()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-eye mr-2"></i>Preview Website
+                    </button>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg min-h-screen">
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <button onclick="showSection('dashboard')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors admin-nav-btn active">
+                            <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('equipment')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors admin-nav-btn">
+                            <i class="fas fa-medkit mr-3"></i>Equipment Management
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('medicine')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors admin-nav-btn">
+                            <i class="fas fa-pills mr-3"></i>Medicine Management
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('blogs')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors admin-nav-btn">
+                            <i class="fas fa-blog mr-3"></i>Blog Management
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('appointments')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors admin-nav-btn">
+                            <i class="fas fa-calendar mr-3"></i>Appointments
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('feedback')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors admin-nav-btn">
+                            <i class="fas fa-comments mr-3"></i>Feedback
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="showSection('analytics')" class="w-full text-left px-4 py-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors admin-nav-btn">
+                            <i class="fas fa-chart-bar mr-3"></i>Analytics
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="admin-section active">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+                
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center">
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i class="fas fa-medkit text-blue-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-700">Equipment Items</h3>
+                                <p class="text-3xl font-bold text-blue-600" id="equipmentCount">24</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center">
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-pills text-green-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-700">Medicine Types</h3>
+                                <p class="text-3xl font-bold text-green-600" id="medicineCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center">
+                            <div class="bg-purple-100 p-3 rounded-full">
+                                <i class="fas fa-blog text-purple-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-700">Blog Posts</h3>
+                                <p class="text-3xl font-bold text-purple-600" id="blogCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <div class="flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-full">
+                                <i class="fas fa-calendar text-yellow-600 text-2xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-semibold text-gray-700">Appointments</h3>
+                                <p class="text-3xl font-bold text-yellow-600" id="appointmentCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h3>
+                    <div id="recentActivity" class="space-y-3">
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <i class="fas fa-info-circle text-blue-500 mr-3"></i>
+                            <span class="text-gray-600">Welcome to NSG Health Admin Panel</span>
+                            <span class="text-sm text-gray-400 ml-auto">Just now</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment Management Section -->
+            <div id="equipment" class="admin-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Equipment Management</h2>
+                    <button onclick="showAddEquipmentForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add New Equipment
+                    </button>
+                </div>
+
+                <!-- Add/Edit Equipment Form -->
+                <div id="equipmentForm" class="bg-white rounded-lg shadow-md p-6 mb-6 hidden">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" id="equipmentFormTitle">Add New Equipment</h3>
+                    <form id="equipmentFormData">
+                        <input type="hidden" id="equipmentId" name="id">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="equipmentName" class="block text-gray-700 font-medium mb-2">Equipment Name</label>
+                                <input type="text" id="equipmentName" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label for="equipmentCategory" class="block text-gray-700 font-medium mb-2">Category</label>
+                                <select id="equipmentCategory" name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    <option value="">Select Category</option>
+                                    <option value="bandages">Bandages & Dressings</option>
+                                    <option value="gloves">Gloves & Protection</option>
+                                    <option value="syringes">Syringes & Needles</option>
+                                    <option value="catheters">Catheters & Tubes</option>
+                                    <option value="diagnostic">Diagnostic Tools</option>
+                                    <option value="surgical">Surgical Supplies</option>
+                                    <option value="lab">Lab Testing</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="equipmentDescription" class="block text-gray-700 font-medium mb-2">Description</label>
+                                <textarea id="equipmentDescription" name="description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+                            </div>
+                            <div>
+                                <label for="equipmentPrice" class="block text-gray-700 font-medium mb-2">Price (KSh)</label>
+                                <input type="number" id="equipmentPrice" name="price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label for="equipmentImage" class="block text-gray-700 font-medium mb-2">Image URL</label>
+                                <input type="url" id="equipmentImage" name="image" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="https://example.com/image.jpg">
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-4 mt-6">
+                            <button type="button" onclick="hideEquipmentForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">Save Equipment</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Equipment List -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800">Current Equipment</h3>
+                    </div>
+                    <div id="equipmentList" class="divide-y divide-gray-200">
+                        <!-- Equipment items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medicine Management Section -->
+            <div id="medicine" class="admin-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Medicine Management</h2>
+                    <button onclick="showAddMedicineForm()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add New Medicine
+                    </button>
+                </div>
+
+                <!-- Add/Edit Medicine Form -->
+                <div id="medicineForm" class="bg-white rounded-lg shadow-md p-6 mb-6 hidden">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" id="medicineFormTitle">Add New Medicine</h3>
+                    <form id="medicineFormData">
+                        <input type="hidden" id="medicineId" name="id">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="medicineName" class="block text-gray-700 font-medium mb-2">Medicine Name</label>
+                                <input type="text" id="medicineName" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                            </div>
+                            <div>
+                                <label for="medicineCategory" class="block text-gray-700 font-medium mb-2">Category</label>
+                                <select id="medicineCategorySelect" name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                                    <option value="">Select Category</option>
+                                    <option value="antibiotics">Antibiotics</option>
+                                    <option value="painkillers">Pain Relief</option>
+                                    <option value="vitamins">Vitamins & Supplements</option>
+                                    <option value="diabetes">Diabetes Care</option>
+                                    <option value="heart">Heart & Blood Pressure</option>
+                                    <option value="respiratory">Respiratory</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="medicineDescription" class="block text-gray-700 font-medium mb-2">Description</label>
+                                <textarea id="medicineDescription" name="description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required></textarea>
+                            </div>
+                            <div>
+                                <label for="medicinePrice" class="block text-gray-700 font-medium mb-2">Price (KSh)</label>
+                                <input type="number" id="medicinePrice" name="price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                            </div>
+                            <div>
+                                <label for="medicineStrength" class="block text-gray-700 font-medium mb-2">Strength/Dosage</label>
+                                <input type="text" id="medicineStrength" name="strength" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="e.g., 500mg, 10ml">
+                            </div>
+                            <div>
+                                <label for="medicineManufacturer" class="block text-gray-700 font-medium mb-2">Manufacturer</label>
+                                <input type="text" id="medicineManufacturer" name="manufacturer" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                            </div>
+                            <div>
+                                <label for="medicineImage" class="block text-gray-700 font-medium mb-2">Image URL</label>
+                                <input type="url" id="medicineImage" name="image" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="https://example.com/image.jpg">
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-4 mt-6">
+                            <button type="button" onclick="hideMedicineForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">Save Medicine</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Medicine List -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800">Current Medicine</h3>
+                    </div>
+                    <div id="medicineList" class="divide-y divide-gray-200">
+                        <!-- Medicine items will be loaded here -->
+                        <div class="p-6 text-center text-gray-500">
+                            <i class="fas fa-pills text-4xl mb-2"></i>
+                            <p>No medicine added yet. Click "Add New Medicine" to get started.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Management Section -->
+            <div id="blogs" class="admin-section">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-gray-800">Blog Management</h2>
+                    <button onclick="showAddBlogForm()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add New Blog Post
+                    </button>
+                </div>
+
+                <!-- Add/Edit Blog Form -->
+                <div id="blogForm" class="bg-white rounded-lg shadow-md p-6 mb-6 hidden">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4" id="blogFormTitle">Add New Blog Post</h3>
+                    <form id="blogFormData">
+                        <input type="hidden" id="blogId" name="id">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="blogTitle" class="block text-gray-700 font-medium mb-2">Blog Title</label>
+                                <input type="text" id="blogTitle" name="title" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                            </div>
+                            <div>
+                                <label for="blogAuthor" class="block text-gray-700 font-medium mb-2">Author</label>
+                                <input type="text" id="blogAuthor" name="author" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                            </div>
+                            <div>
+                                <label for="blogExcerpt" class="block text-gray-700 font-medium mb-2">Excerpt</label>
+                                <textarea id="blogExcerpt" name="excerpt" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Brief description of the blog post" required></textarea>
+                            </div>
+                            <div>
+                                <label for="blogContent" class="block text-gray-700 font-medium mb-2">Content</label>
+                                <textarea id="blogContent" name="content" rows="10" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" required></textarea>
+                            </div>
+                            <div>
+                                <label for="blogImage" class="block text-gray-700 font-medium mb-2">Featured Image URL</label>
+                                <input type="url" id="blogImage" name="image" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="https://example.com/image.jpg">
+                            </div>
+                            <div>
+                                <label for="blogTags" class="block text-gray-700 font-medium mb-2">Tags (comma-separated)</label>
+                                <input type="text" id="blogTags" name="tags" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="health, medicine, wellness">
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-4 mt-6">
+                            <button type="button" onclick="hideBlogForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
+                            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">Publish Blog Post</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Blog List -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800">Published Blog Posts</h3>
+                    </div>
+                    <div id="blogList" class="divide-y divide-gray-200">
+                        <!-- Blog posts will be loaded here -->
+                        <div class="p-6 text-center text-gray-500">
+                            <i class="fas fa-blog text-4xl mb-2"></i>
+                            <p>No blog posts published yet. Click "Add New Blog Post" to get started.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments Section -->
+            <div id="appointments" class="admin-section">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Appointment Management</h2>
+                
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800">Recent Appointments</h3>
+                    </div>
+                    <div id="appointmentsList" class="divide-y divide-gray-200">
+                        <div class="p-6 text-center text-gray-500">
+                            <i class="fas fa-calendar text-4xl mb-2"></i>
+                            <p>No appointments yet. Appointments will appear here when patients book through the website.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div id="feedback" class="admin-section">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Customer Feedback</h2>
+                
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="p-6 border-b border-gray-200">
+                        <h3 class="text-xl font-semibold text-gray-800">Recent Feedback</h3>
+                    </div>
+                    <div id="feedbackList" class="divide-y divide-gray-200">
+                        <div class="p-6 text-center text-gray-500">
+                            <i class="fas fa-comments text-4xl mb-2"></i>
+                            <p>No feedback yet. Customer feedback will appear here when submitted through the website.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics" class="admin-section">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Analytics</h2>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Popular Equipment</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Zinc Oxide Bandages</span>
+                                <span class="text-blue-600 font-semibold">45 orders</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Latex Gloves</span>
+                                <span class="text-blue-600 font-semibold">38 orders</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Digital Thermometer</span>
+                                <span class="text-blue-600 font-semibold">32 orders</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Service Requests</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Medical Consultation</span>
+                                <span class="text-green-600 font-semibold">28 requests</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Medical Attention</span>
+                                <span class="text-green-600 font-semibold">22 requests</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Family Physician</span>
+                                <span class="text-green-600 font-semibold">15 requests</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Authentication check
+        function checkAuthentication() {
+            const session = localStorage.getItem('nsg_admin_session');
+            if (!session) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            const sessionData = JSON.parse(session);
+            const loginTime = new Date(sessionData.loginTime);
+            const now = new Date();
+            const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+            
+            // Check if session is expired (8 hours for regular login, unlimited for remember me)
+            if (!sessionData.rememberMe && hoursDiff > 8) {
+                localStorage.removeItem('nsg_admin_session');
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            // Update welcome message
+            document.getElementById('currentUser').textContent = `Welcome, ${sessionData.name}`;
+            return true;
+        }
+
+        // Real-time communication system
+        class RealTimeSync {
+            constructor() {
+                this.isActive = true;
+                this.lastUpdate = Date.now();
+                this.syncEvents = ['equipment', 'medicine', 'blogs', 'appointments', 'feedback'];
+                this.setupStorageListener();
+                this.startHeartbeat();
+            }
+
+            setupStorageListener() {
+                // Listen for changes from the frontend
+                window.addEventListener('storage', (e) => {
+                    if (e.key && e.key.startsWith('nsg_')) {
+                        this.handleExternalChange(e.key, e.newValue);
+                    }
+                });
+
+                // Listen for changes within the same tab
+                this.originalSetItem = Storage.prototype.setItem;
+                Storage.prototype.setItem = (key, value) => {
+                    const oldValue = localStorage.getItem(key);
+                    this.originalSetItem.call(localStorage, key, value);
+                    
+                    if (key.startsWith('nsg_') && oldValue !== value) {
+                        this.broadcastChange(key, value);
+                    }
+                };
+            }
+
+            handleExternalChange(key, newValue) {
+                console.log('External change detected:', key);
+                
+                if (key === 'nsg_equipment' && newValue) {
+                    equipmentData = JSON.parse(newValue);
+                    updateEquipmentList();
+                    updateCounts();
+                    showNotification('Equipment updated from frontend', 'info');
+                }
+                
+                if (key === 'nsg_medicine' && newValue) {
+                    medicineData = JSON.parse(newValue);
+                    updateMedicineList();
+                    updateCounts();
+                    showNotification('Medicine updated from frontend', 'info');
+                }
+                
+                if (key === 'nsg_blogs' && newValue) {
+                    blogData = JSON.parse(newValue);
+                    updateBlogList();
+                    updateCounts();
+                    showNotification('Blogs updated from frontend', 'info');
+                }
+
+                if (key === 'nsg_frontend_activity') {
+                    this.handleFrontendActivity(JSON.parse(newValue));
+                }
+            }
+
+            broadcastChange(key, value) {
+                // Trigger custom event for real-time updates
+                const changeEvent = new CustomEvent('nsgDataChange', {
+                    detail: { key, value, timestamp: Date.now() }
+                });
+                window.dispatchEvent(changeEvent);
+                
+                // Update sync indicator
+                this.updateSyncIndicator();
+            }
+
+            handleFrontendActivity(activity) {
+                // Handle activities from frontend (appointments, feedback, etc.)
+                const activities = JSON.parse(localStorage.getItem('nsg_admin_activities') || '[]');
+                activities.unshift({
+                    ...activity,
+                    timestamp: new Date().toISOString(),
+                    source: 'frontend'
+                });
+                
+                if (activities.length > 100) activities.splice(100);
+                localStorage.setItem('nsg_admin_activities', JSON.stringify(activities));
+                
+                // Update dashboard
+                updateRecentActivity();
+                showNotification(`New ${activity.type} from website`, 'info');
+            }
+
+            updateSyncIndicator() {
+                const indicator = document.getElementById('realTimeStatus');
+                indicator.classList.add('status-online');
+                indicator.innerHTML = '<span class="status-indicator status-online"></span>Data synced';
+                
+                setTimeout(() => {
+                    indicator.innerHTML = '<span class="status-indicator status-online"></span>Real-time sync active';
+                }, 2000);
+            }
+
+            startHeartbeat() {
+                setInterval(() => {
+                    // Send heartbeat to indicate admin is active
+                    localStorage.setItem('nsg_admin_heartbeat', Date.now().toString());
+                }, 5000);
+            }
+        }
+
+        // Global data storage
+        let equipmentData = [];
+        let medicineData = [];
+        let blogData = [];
+        let appointmentsData = [];
+        let feedbackData = [];
+        let realTimeSync;
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            
+            // Set color based on type
+            notification.className = `notification px-6 py-3 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                type === 'info' ? 'bg-blue-500' : 'bg-gray-500'
+            } text-white`;
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.admin-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update navigation
+            document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-100', 'text-blue-600');
+            });
+            event.target.classList.add('active', 'bg-blue-100', 'text-blue-600');
+        }
+
+        // Equipment Management
+        function showAddEquipmentForm() {
+            document.getElementById('equipmentForm').classList.remove('hidden');
+            document.getElementById('equipmentFormTitle').textContent = 'Add New Equipment';
+            document.getElementById('equipmentFormData').reset();
+            document.getElementById('equipmentId').value = '';
+        }
+
+        function hideEquipmentForm() {
+            document.getElementById('equipmentForm').classList.add('hidden');
+        }
+
+        function editEquipment(id) {
+            const equipment = equipmentData.find(item => item.id === id);
+            if (equipment) {
+                document.getElementById('equipmentForm').classList.remove('hidden');
+                document.getElementById('equipmentFormTitle').textContent = 'Edit Equipment';
+                document.getElementById('equipmentId').value = equipment.id;
+                document.getElementById('equipmentName').value = equipment.name;
+                document.getElementById('equipmentCategory').value = equipment.category;
+                document.getElementById('equipmentDescription').value = equipment.description;
+                document.getElementById('equipmentPrice').value = equipment.price;
+                document.getElementById('equipmentImage').value = equipment.image || '';
+            }
+        }
+
+        function deleteEquipment(id) {
+            if (confirm('Are you sure you want to delete this equipment?')) {
+                const equipment = equipmentData.find(item => item.id === id);
+                equipmentData = equipmentData.filter(item => item.id !== id);
+                updateEquipmentList();
+                updateCounts();
+                showNotification('Equipment deleted successfully');
+                logActivity('equipment_delete', { name: equipment?.name });
+                syncToFrontend();
+            }
+        }
+
+        function updateEquipmentList() {
+            const equipmentList = document.getElementById('equipmentList');
+            
+            if (equipmentData.length === 0) {
+                equipmentList.innerHTML = `
+                    <div class="p-6 text-center text-gray-500">
+                        <i class="fas fa-medkit text-4xl mb-2"></i>
+                        <p>No equipment added yet. Click "Add New Equipment" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            equipmentList.innerHTML = equipmentData.map(equipment => `
+                <div class="p-6 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        ${equipment.image ? 
+                            `<img src="${equipment.image}" alt="${equipment.name}" class="w-16 h-16 object-cover rounded-lg">` :
+                            `<div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-medkit text-blue-600 text-2xl"></i>
+                            </div>`
+                        }
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">${equipment.name}</h4>
+                            <p class="text-gray-600">${equipment.description}</p>
+                            <p class="text-blue-600 font-semibold">KSh ${equipment.price}</p>
+                            <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">${equipment.category}</span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="editEquipment('${equipment.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteEquipment('${equipment.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Medicine Management
+        function showAddMedicineForm() {
+            document.getElementById('medicineForm').classList.remove('hidden');
+            document.getElementById('medicineFormTitle').textContent = 'Add New Medicine';
+            document.getElementById('medicineFormData').reset();
+            document.getElementById('medicineId').value = '';
+        }
+
+        function hideMedicineForm() {
+            document.getElementById('medicineForm').classList.add('hidden');
+        }
+
+        function editMedicine(id) {
+            const medicine = medicineData.find(item => item.id === id);
+            if (medicine) {
+                document.getElementById('medicineForm').classList.remove('hidden');
+                document.getElementById('medicineFormTitle').textContent = 'Edit Medicine';
+                document.getElementById('medicineId').value = medicine.id;
+                document.getElementById('medicineName').value = medicine.name;
+                document.getElementById('medicineCategorySelect').value = medicine.category;
+                document.getElementById('medicineDescription').value = medicine.description;
+                document.getElementById('medicinePrice').value = medicine.price;
+                document.getElementById('medicineStrength').value = medicine.strength || '';
+                document.getElementById('medicineManufacturer').value = medicine.manufacturer || '';
+                document.getElementById('medicineImage').value = medicine.image || '';
+            }
+        }
+
+        function deleteMedicine(id) {
+            if (confirm('Are you sure you want to delete this medicine?')) {
+                const medicine = medicineData.find(item => item.id === id);
+                medicineData = medicineData.filter(item => item.id !== id);
+                updateMedicineList();
+                updateCounts();
+                showNotification('Medicine deleted successfully');
+                logActivity('medicine_delete', { name: medicine?.name });
+                syncToFrontend();
+            }
+        }
+
+        function updateMedicineList() {
+            const medicineList = document.getElementById('medicineList');
+            
+            if (medicineData.length === 0) {
+                medicineList.innerHTML = `
+                    <div class="p-6 text-center text-gray-500">
+                        <i class="fas fa-pills text-4xl mb-2"></i>
+                        <p>No medicine added yet. Click "Add New Medicine" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            medicineList.innerHTML = medicineData.map(medicine => `
+                <div class="p-6 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        ${medicine.image ? 
+                            `<img src="${medicine.image}" alt="${medicine.name}" class="w-16 h-16 object-cover rounded-lg">` :
+                            `<div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-pills text-green-600 text-2xl"></i>
+                            </div>`
+                        }
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">${medicine.name}</h4>
+                            <p class="text-gray-600">${medicine.description}</p>
+                            <p class="text-green-600 font-semibold">KSh ${medicine.price}</p>
+                            <div class="flex space-x-2 mt-1">
+                                <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">${medicine.category}</span>
+                                ${medicine.strength ? `<span class="text-sm text-gray-500 bg-blue-100 px-2 py-1 rounded">${medicine.strength}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="editMedicine('${medicine.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteMedicine('${medicine.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Blog Management
+        function showAddBlogForm() {
+            document.getElementById('blogForm').classList.remove('hidden');
+            document.getElementById('blogFormTitle').textContent = 'Add New Blog Post';
+            document.getElementById('blogFormData').reset();
+            document.getElementById('blogId').value = '';
+        }
+
+        function hideBlogForm() {
+            document.getElementById('blogForm').classList.add('hidden');
+        }
+
+        function editBlog(id) {
+            const blog = blogData.find(item => item.id === id);
+            if (blog) {
+                document.getElementById('blogForm').classList.remove('hidden');
+                document.getElementById('blogFormTitle').textContent = 'Edit Blog Post';
+                document.getElementById('blogId').value = blog.id;
+                document.getElementById('blogTitle').value = blog.title;
+                document.getElementById('blogAuthor').value = blog.author;
+                document.getElementById('blogExcerpt').value = blog.excerpt;
+                document.getElementById('blogContent').value = blog.content;
+                document.getElementById('blogImage').value = blog.image || '';
+                document.getElementById('blogTags').value = blog.tags ? blog.tags.join(', ') : '';
+            }
+        }
+
+        function deleteBlog(id) {
+            if (confirm('Are you sure you want to delete this blog post?')) {
+                const blog = blogData.find(item => item.id === id);
+                blogData = blogData.filter(item => item.id !== id);
+                updateBlogList();
+                updateCounts();
+                showNotification('Blog post deleted successfully');
+                logActivity('blog_delete', { title: blog?.title });
+                syncToFrontend();
+            }
+        }
+
+        function updateBlogList() {
+            const blogList = document.getElementById('blogList');
+            
+            if (blogData.length === 0) {
+                blogList.innerHTML = `
+                    <div class="p-6 text-center text-gray-500">
+                        <i class="fas fa-blog text-4xl mb-2"></i>
+                        <p>No blog posts published yet. Click "Add New Blog Post" to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            blogList.innerHTML = blogData.map(blog => `
+                <div class="p-6 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        ${blog.image ? 
+                            `<img src="${blog.image}" alt="${blog.title}" class="w-16 h-16 object-cover rounded-lg">` :
+                            `<div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-blog text-purple-600 text-2xl"></i>
+                            </div>`
+                        }
+                        <div>
+                            <h4 class="text-lg font-semibold text-gray-800">${blog.title}</h4>
+                            <p class="text-gray-600 text-sm">${blog.excerpt}</p>
+                            <p class="text-sm text-gray-500">By ${blog.author} • ${new Date(blog.publishedAt).toLocaleDateString()}</p>
+                            ${blog.tags && blog.tags.length > 0 ? 
+                                `<div class="flex space-x-1 mt-2">
+                                    ${blog.tags.map(tag => `<span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">${tag}</span>`).join('')}
+                                </div>` : ''
+                            }
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="editBlog('${blog.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteBlog('${blog.id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Form submissions
+        document.getElementById('equipmentFormData').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const equipmentData_item = {
+                id: formData.get('id') || Date.now().toString(),
+                name: formData.get('name'),
+                category: formData.get('category'),
+                description: formData.get('description'),
+                price: formData.get('price'),
+                image: formData.get('image')
+            };
+            
+            if (formData.get('id')) {
+                // Edit existing
+                const index = equipmentData.findIndex(item => item.id === formData.get('id'));
+                equipmentData[index] = equipmentData_item;
+                showNotification('Equipment updated successfully');
+                logActivity('equipment_edit', { name: equipmentData_item.name });
+            } else {
+                // Add new
+                equipmentData.push(equipmentData_item);
+                showNotification('Equipment added successfully');
+                logActivity('equipment_add', { name: equipmentData_item.name });
+            }
+            
+            updateEquipmentList();
+            updateCounts();
+            hideEquipmentForm();
+            syncToFrontend();
+        });
+
+        document.getElementById('medicineFormData').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const medicineItem = {
+                id: formData.get('id') || Date.now().toString(),
+                name: formData.get('name'),
+                category: formData.get('category'),
+                description: formData.get('description'),
+                price: formData.get('price'),
+                strength: formData.get('strength'),
+                manufacturer: formData.get('manufacturer'),
+                image: formData.get('image')
+            };
+            
+            if (formData.get('id')) {
+                // Edit existing
+                const index = medicineData.findIndex(item => item.id === formData.get('id'));
+                medicineData[index] = medicineItem;
+                showNotification('Medicine updated successfully');
+                logActivity('medicine_edit', { name: medicineItem.name });
+            } else {
+                // Add new
+                medicineData.push(medicineItem);
+                showNotification('Medicine added successfully');
+                logActivity('medicine_add', { name: medicineItem.name });
+            }
+            
+            updateMedicineList();
+            updateCounts();
+            hideMedicineForm();
+            syncToFrontend();
+        });
+
+        document.getElementById('blogFormData').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const blogItem = {
+                id: formData.get('id') || Date.now().toString(),
+                title: formData.get('title'),
+                author: formData.get('author'),
+                excerpt: formData.get('excerpt'),
+                content: formData.get('content'),
+                image: formData.get('image'),
+                tags: formData.get('tags') ? formData.get('tags').split(',').map(tag => tag.trim()) : [],
+                publishedAt: formData.get('id') ? blogData.find(b => b.id === formData.get('id')).publishedAt : new Date().toISOString()
+            };
+            
+            if (formData.get('id')) {
+                // Edit existing
+                const index = blogData.findIndex(item => item.id === formData.get('id'));
+                blogData[index] = blogItem;
+                showNotification('Blog post updated successfully');
+                logActivity('blog_edit', { title: blogItem.title });
+            } else {
+                // Add new
+                blogData.push(blogItem);
+                showNotification('Blog post published successfully');
+                logActivity('blog_add', { title: blogItem.title });
+            }
+            
+            updateBlogList();
+            updateCounts();
+            hideBlogForm();
+            syncToFrontend();
+        });
+
+        // Update counts
+        function updateCounts() {
+            document.getElementById('equipmentCount').textContent = equipmentData.length;
+            document.getElementById('medicineCount').textContent = medicineData.length;
+            document.getElementById('blogCount').textContent = blogData.length;
+            document.getElementById('appointmentCount').textContent = appointmentsData.length;
+        }
+
+        // Enhanced sync data to frontend (real-time updates)
+        function syncToFrontend() {
+            // Store data with timestamp for versioning
+            const timestamp = Date.now();
+            
+            localStorage.setItem('nsg_equipment', JSON.stringify(equipmentData));
+            localStorage.setItem('nsg_medicine', JSON.stringify(medicineData));
+            localStorage.setItem('nsg_blogs', JSON.stringify(blogData));
+            localStorage.setItem('nsg_last_update', timestamp.toString());
+            
+            // Trigger storage event for cross-tab communication
+            window.dispatchEvent(new StorageEvent('storage', {
+                key: 'nsg_last_update',
+                newValue: timestamp.toString(),
+                url: window.location.href
+            }));
+            
+            console.log('Data synced to frontend:', {
+                equipment: equipmentData.length,
+                medicine: medicineData.length,
+                blogs: blogData.length,
+                timestamp: new Date(timestamp).toLocaleString()
+            });
+        }
+
+        // Enhanced load data with real-time updates
+        function loadData() {
+            const storedEquipment = localStorage.getItem('nsg_equipment');
+            const storedMedicine = localStorage.getItem('nsg_medicine');
+            const storedBlogs = localStorage.getItem('nsg_blogs');
+            
+            if (storedEquipment) {
+                equipmentData = JSON.parse(storedEquipment);
+                updateEquipmentList();
+            }
+            
+            if (storedMedicine) {
+                medicineData = JSON.parse(storedMedicine);
+                updateMedicineList();
+            }
+            
+            if (storedBlogs) {
+                blogData = JSON.parse(storedBlogs);
+                updateBlogList();
+            }
+            
+            updateCounts();
+            updateRecentActivity();
+        }
+
+        // Update recent activity from localStorage
+        function updateRecentActivity() {
+            const activities = JSON.parse(localStorage.getItem('nsg_admin_activities') || '[]');
+            const activityContainer = document.getElementById('recentActivity');
+            
+            if (activities.length === 0) {
+                activityContainer.innerHTML = `
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <i class="fas fa-info-circle text-blue-500 mr-3"></i>
+                        <span class="text-gray-600">Welcome to NSG Health Admin Panel</span>
+                        <span class="text-sm text-gray-400 ml-auto">Just now</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            activityContainer.innerHTML = activities.slice(0, 5).map(activity => {
+                const timeAgo = getTimeAgo(new Date(activity.timestamp));
+                const icon = getActivityIcon(activity.type);
+                const color = getActivityColor(activity.type);
+                
+                return `
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <i class="fas ${icon} ${color} mr-3"></i>
+                        <span class="text-gray-600">${getActivityMessage(activity)}</span>
+                        <span class="text-sm text-gray-400 ml-auto">${timeAgo}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getActivityIcon(type) {
+            switch(type) {
+                case 'login': return 'fa-sign-in-alt';
+                case 'equipment_add': return 'fa-plus';
+                case 'equipment_edit': return 'fa-edit';
+                case 'equipment_delete': return 'fa-trash';
+                case 'medicine_add': return 'fa-plus';
+                case 'medicine_edit': return 'fa-edit';
+                case 'medicine_delete': return 'fa-trash';
+                case 'blog_add': return 'fa-plus';
+                case 'blog_edit': return 'fa-edit';
+                case 'blog_delete': return 'fa-trash';
+                case 'appointment': return 'fa-calendar';
+                case 'feedback': return 'fa-comment';
+                case 'order': return 'fa-shopping-cart';
+                default: return 'fa-info-circle';
+            }
+        }
+
+        function getActivityColor(type) {
+            switch(type) {
+                case 'login': return 'text-green-500';
+                case 'equipment_add': case 'medicine_add': case 'blog_add': return 'text-blue-500';
+                case 'equipment_edit': case 'medicine_edit': case 'blog_edit': return 'text-yellow-500';
+                case 'equipment_delete': case 'medicine_delete': case 'blog_delete': return 'text-red-500';
+                case 'appointment': return 'text-purple-500';
+                case 'feedback': return 'text-indigo-500';
+                case 'order': return 'text-green-600';
+                default: return 'text-gray-500';
+            }
+        }
+
+        function getActivityMessage(activity) {
+            switch(activity.type) {
+                case 'login': 
+                    return `${activity.user} (${activity.role}) logged in`;
+                case 'equipment_add': 
+                    return `Added equipment: ${activity.name}`;
+                case 'equipment_edit': 
+                    return `Updated equipment: ${activity.name}`;
+                case 'equipment_delete': 
+                    return `Deleted equipment: ${activity.name}`;
+                case 'medicine_add': 
+                    return `Added medicine: ${activity.name}`;
+                case 'medicine_edit': 
+                    return `Updated medicine: ${activity.name}`;
+                case 'medicine_delete': 
+                    return `Deleted medicine: ${activity.name}`;
+                case 'blog_add': 
+                    return `Published blog: ${activity.title}`;
+                case 'blog_edit': 
+                    return `Updated blog: ${activity.title}`;
+                case 'blog_delete': 
+                    return `Deleted blog: ${activity.title}`;
+                case 'appointment': 
+                    return `New appointment request from ${activity.name}`;
+                case 'feedback': 
+                    return `New feedback from ${activity.name}`;
+                case 'order': 
+                    return `New order for ${activity.product}`;
+                default: 
+                    return activity.message || 'Unknown activity';
+            }
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            return `${days}d ago`;
+        }
+
+        // Log activity function
+        function logActivity(type, data = {}) {
+            const session = JSON.parse(localStorage.getItem('nsg_admin_session') || '{}');
+            const activity = {
+                type,
+                ...data,
+                user: session.name || 'Unknown',
+                role: session.role || 'admin',
+                timestamp: new Date().toISOString()
+            };
+            
+            const activities = JSON.parse(localStorage.getItem('nsg_admin_activities') || '[]');
+            activities.unshift(activity);
+            if (activities.length > 100) activities.splice(100);
+            localStorage.setItem('nsg_admin_activities', JSON.stringify(activities));
+            
+            updateRecentActivity();
+        }
+
+        // Utility functions
+        function previewWebsite() {
+            window.open('index.html', '_blank');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Log the logout activity
+                logActivity('logout');
+                
+                // Clear session data
+                localStorage.removeItem('nsg_admin_session');
+                
+                // Redirect to login
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            if (!checkAuthentication()) {
+                return;
+            }
+            
+            // Initialize real-time sync
+            realTimeSync = new RealTimeSync();
+            
+            // Load data
+            loadData();
+            
+            // Initialize with sample equipment if none exists
+            if (equipmentData.length === 0) {
+                const sampleEquipment = [
+                    {
+                        id: 'eq1',
+                        name: 'Digital Blood Pressure Monitor',
+                        category: 'diagnostic',
+                        description: 'Automatic digital blood pressure monitor with large LCD display and memory function.',
+                        price: 3500,
+                        image: ''
+                    },
+                    {
+                        id: 'eq2',
+                        name: 'Pulse Oximeter',
+                        category: 'diagnostic',
+                        description: 'Fingertip pulse oximeter for measuring oxygen saturation and pulse rate.',
+                        price: 1200,
+                        image: ''
+                    },
+                    {
+                        id: 'eq3',
+                        name: 'Digital Thermometer',
+                        category: 'diagnostic',
+                        description: 'Fast and accurate digital thermometer with flexible tip.',
+                        price: 450,
+                        image: ''
+                    }
+                ];
+                
+                equipmentData = sampleEquipment;
+                realTimeSync.syncToFrontend('equipment', equipmentData);
+                updateEquipmentList();
+                updateDashboard();
+                
+                // Log the initialization
+                logActivity('system', { message: 'Sample equipment data initialized' });
+            }
+            
+            // Set equipment count
+            document.getElementById('equipmentCount').textContent = equipmentData.length;
+        });
+    </script>
+</body>
+</html>

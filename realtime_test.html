@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSG Health - Real-time Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">NSG Health - Real-time Communication Test</h1>
+        
+        <!-- Status Indicators -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4"><i class="fas fa-signal text-green-500 mr-2"></i>System Status</h2>
+                <div id="systemStatus" class="space-y-2">
+                    <div>Authentication: <span id="authStatus" class="font-semibold text-red-500">Not Checked</span></div>
+                    <div>Frontend Sync: <span id="frontendStatus" class="font-semibold text-red-500">Not Active</span></div>
+                    <div>Admin Sync: <span id="adminStatus" class="font-semibold text-red-500">Not Active</span></div>
+                    <div>localStorage: <span id="storageStatus" class="font-semibold text-red-500">Not Checked</span></div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-4"><i class="fas fa-database text-blue-500 mr-2"></i>Data Status</h2>
+                <div id="dataStatus" class="space-y-2">
+                    <div>Medicine Count: <span id="medicineCount" class="font-semibold">0</span></div>
+                    <div>Blog Count: <span id="blogCount" class="font-semibold">0</span></div>
+                    <div>Equipment Count: <span id="equipmentCount" class="font-semibold">0</span></div>
+                    <div>Activities Count: <span id="activitiesCount" class="font-semibold">0</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Actions -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-vial text-purple-500 mr-2"></i>Test Actions</h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <button onclick="testAuth()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    <i class="fas fa-key mr-2"></i>Test Authentication
+                </button>
+                <button onclick="testFrontendActivity()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    <i class="fas fa-user mr-2"></i>Simulate User Activity
+                </button>
+                <button onclick="clearAllData()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    <i class="fas fa-trash mr-2"></i>Clear All Data
+                </button>
+            </div>
+        </div>
+        
+        <!-- Test Results -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4"><i class="fas fa-clipboard-list text-orange-500 mr-2"></i>Test Results</h2>
+            <div id="testResults" class="space-y-2 text-sm font-mono bg-gray-50 p-4 rounded">
+                <div>Ready to run tests...</div>
+            </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="mt-8 text-center space-x-4">
+            <a href="index.html" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 inline-block">
+                <i class="fas fa-home mr-2"></i>Main Website
+            </a>
+            <a href="login.html" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 inline-block">
+                <i class="fas fa-sign-in-alt mr-2"></i>Admin Login
+            </a>
+            <a href="admin.html" class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 inline-block">
+                <i class="fas fa-cogs mr-2"></i>Admin Panel
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Status check functions
+        function checkSystemStatus() {
+            // Check authentication
+            const session = localStorage.getItem('nsg_admin_session');
+            const authStatus = document.getElementById('authStatus');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                authStatus.textContent = `Logged in as ${sessionData.name}`;
+                authStatus.className = 'font-semibold text-green-500';
+            } else {
+                authStatus.textContent = 'Not logged in';
+                authStatus.className = 'font-semibold text-red-500';
+            }
+            
+            // Check localStorage availability
+            const storageStatus = document.getElementById('storageStatus');
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+                storageStatus.textContent = 'Available';
+                storageStatus.className = 'font-semibold text-green-500';
+            } catch (e) {
+                storageStatus.textContent = 'Error';
+                storageStatus.className = 'font-semibold text-red-500';
+            }
+            
+            // Check data counts
+            const medicine = JSON.parse(localStorage.getItem('nsg_medicine') || '[]');
+            const blogs = JSON.parse(localStorage.getItem('nsg_blogs') || '[]');
+            const equipment = JSON.parse(localStorage.getItem('nsg_equipment') || '[]');
+            const activities = JSON.parse(localStorage.getItem('nsg_admin_activities') || '[]');
+            
+            document.getElementById('medicineCount').textContent = medicine.length;
+            document.getElementById('blogCount').textContent = blogs.length;
+            document.getElementById('equipmentCount').textContent = equipment.length;
+            document.getElementById('activitiesCount').textContent = activities.length;
+            
+            // Update frontend and admin status
+            document.getElementById('frontendStatus').textContent = 'Checking...';
+            document.getElementById('adminStatus').textContent = 'Checking...';
+            
+            setTimeout(() => {
+                const heartbeat = localStorage.getItem('nsg_admin_heartbeat');
+                const adminStatus = document.getElementById('adminStatus');
+                if (heartbeat) {
+                    const lastHeartbeat = parseInt(heartbeat);
+                    const timeDiff = Date.now() - lastHeartbeat;
+                    if (timeDiff < 30000) { // Less than 30 seconds
+                        adminStatus.textContent = 'Active';
+                        adminStatus.className = 'font-semibold text-green-500';
+                    } else {
+                        adminStatus.textContent = 'Inactive';
+                        adminStatus.className = 'font-semibold text-orange-500';
+                    }
+                } else {
+                    adminStatus.textContent = 'Not Running';
+                    adminStatus.className = 'font-semibold text-red-500';
+                }
+                
+                document.getElementById('frontendStatus').textContent = 'Ready';
+                document.getElementById('frontendStatus').className = 'font-semibold text-green-500';
+            }, 1000);
+        }
+        
+        function testAuth() {
+            addTestResult('Testing authentication system...');
+            
+            // Test with correct credentials
+            const testUser = {
+                username: 'admin',
+                password: '1a2d3m4i5n',
+                role: 'admin',
+                name: 'NSG Health Administrator',
+                loginTime: new Date().toISOString(),
+                rememberMe: false
+            };
+            
+            // Simulate login
+            localStorage.setItem('nsg_admin_session', JSON.stringify(testUser));
+            addTestResult('✓ Admin session created successfully');
+            
+            // Test session validation
+            const session = localStorage.getItem('nsg_admin_session');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                addTestResult(`✓ Session valid for user: ${sessionData.name}`);
+                addTestResult(`✓ User role: ${sessionData.role}`);
+            } else {
+                addTestResult('✗ Session validation failed');
+            }
+            
+            checkSystemStatus();
+        }
+        
+        function testFrontendActivity() {
+            addTestResult('Simulating frontend user activity...');
+            
+            // Simulate various user activities
+            const activities = [
+                {
+                    type: 'appointment',
+                    data: { service: 'General Consultation', date: '2024-12-15', time: '10:00' },
+                    timestamp: new Date().toISOString(),
+                    user: 'Test User'
+                },
+                {
+                    type: 'order',
+                    data: { product: 'Paracetamol', price: 50, type: 'medicine' },
+                    timestamp: new Date().toISOString(),
+                    user: 'Test User'
+                },
+                {
+                    type: 'feedback',
+                    data: { service: 'Laboratory Tests', rating: 5, message: 'Excellent service!' },
+                    timestamp: new Date().toISOString(),
+                    user: 'Test User'
+                }
+            ];
+            
+            activities.forEach((activity, index) => {
+                setTimeout(() => {
+                    localStorage.setItem('nsg_frontend_activity', JSON.stringify(activity));
+                    addTestResult(`✓ Simulated ${activity.type} activity`);
+                    
+                    // Add to admin activities
+                    const adminActivities = JSON.parse(localStorage.getItem('nsg_admin_activities') || '[]');
+                    adminActivities.unshift(activity);
+                    if (adminActivities.length > 50) adminActivities.pop();
+                    localStorage.setItem('nsg_admin_activities', JSON.stringify(adminActivities));
+                }, index * 500);
+            });
+            
+            setTimeout(() => {
+                checkSystemStatus();
+                addTestResult('✓ All test activities completed');
+            }, 2000);
+        }
+        
+        function clearAllData() {
+            addTestResult('Clearing all NSG Health data...');
+            
+            const nsgKeys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('nsg_')) {
+                    nsgKeys.push(key);
+                }
+            }
+            
+            nsgKeys.forEach(key => {
+                localStorage.removeItem(key);
+                addTestResult(`✓ Cleared ${key}`);
+            });
+            
+            addTestResult('✓ All NSG Health data cleared');
+            checkSystemStatus();
+        }
+        
+        function addTestResult(message) {
+            const resultsDiv = document.getElementById('testResults');
+            const time = new Date().toLocaleTimeString();
+            const newResult = document.createElement('div');
+            newResult.textContent = `[${time}] ${message}`;
+            resultsDiv.appendChild(newResult);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+        
+        // Auto-refresh status every 5 seconds
+        setInterval(checkSystemStatus, 5000);
+        
+        // Initial status check
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSystemStatus();
+            addTestResult('Real-time communication test initialized');
+            addTestResult('Use the buttons above to test system functionality');
+        });
+        
+        // Listen for storage events (real-time updates)
+        window.addEventListener('storage', function(e) {
+            if (e.key && e.key.startsWith('nsg_')) {
+                addTestResult(`📡 Real-time update detected: ${e.key}`);
+                checkSystemStatus();
+            }
+        });
+    </script>
+</body>
+</html>

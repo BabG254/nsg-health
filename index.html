@@ -114,6 +114,8 @@
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('about')">About</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('services')">Services</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('catalogue')">Equipment</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('medicine')">Medicine</a>
+                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('blogs')">Blogs</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('feedback')">Feedback</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('careers')">Careers</a>
                 <a href="#" class="text-gray-600 hover:text-blue-600 font-medium" onclick="showPage('contact')">Contact</a>
@@ -127,6 +129,8 @@
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('about')">About</a>
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('services')">Services</a>
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('catalogue')">Equipment</a>
+            <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('medicine')">Medicine</a>
+            <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('blogs')">Blogs</a>
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('feedback')">Feedback</a>
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('careers')">Careers</a>
             <a href="#" class="block py-2 text-gray-600 border-b border-gray-100" onclick="showPage('contact')">Contact</a>
@@ -886,6 +890,75 @@
             </section>
         </div>
         
+        <!-- Medicine Page -->
+        <div id="medicine" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">Medicine Types</h1>
+                    <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">Browse our comprehensive range of medical supplies and pharmaceuticals available for delivery.</p>
+                    
+                    <!-- Search and Filter -->
+                    <div class="mb-8">
+                        <div class="flex flex-col md:flex-row gap-4 mb-6">
+                            <div class="relative flex-grow">
+                                <input type="text" id="medicineSearch" placeholder="Search medicine..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <select id="medicineCategory" class="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">All Categories</option>
+                                <option value="antibiotics">Antibiotics</option>
+                                <option value="painkillers">Pain Relief</option>
+                                <option value="vitamins">Vitamins & Supplements</option>
+                                <option value="diabetes">Diabetes Care</option>
+                                <option value="heart">Heart & Blood Pressure</option>
+                                <option value="respiratory">Respiratory</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Medicine Grid -->
+                    <div id="medicine-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 min-h-64">
+                        <!-- Empty state message -->
+                        <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                            <i class="fas fa-pills text-6xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">No Medicine Yet</h3>
+                            <p class="text-gray-500">Medicine types will be added by the admin soon.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Blogs Page -->
+        <div id="blogs" class="page">
+            <section class="py-12 bg-white">
+                <div class="container mx-auto px-4">
+                    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">Health Blog</h1>
+                    <p class="text-gray-600 text-center max-w-2xl mx-auto mb-12">Stay informed with our latest health articles, tips, and medical insights from our healthcare professionals.</p>
+                    
+                    <!-- Search -->
+                    <div class="mb-8">
+                        <div class="max-w-md mx-auto">
+                            <div class="relative">
+                                <input type="text" id="blogSearch" placeholder="Search blog posts..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Blog Grid -->
+                    <div id="blogs-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-64">
+                        <!-- Empty state message -->
+                        <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                            <i class="fas fa-blog text-6xl text-gray-300 mb-4"></i>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">No Blogs Yet</h3>
+                            <p class="text-gray-500">Blog posts will be added by the admin soon.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
         <!-- Booking Page -->
         <div id="booking" class="page">
             <section class="py-12 bg-white">
@@ -1407,6 +1480,8 @@
                             <li><a href="#" class="hover:underline" onclick="showPage('about')">About Us</a></li>
                             <li><a href="#" class="hover:underline" onclick="showPage('services')">Services</a></li>
                             <li><a href="#" class="hover:underline" onclick="showPage('catalogue')">Medical Supplies</a></li>
+                            <li><a href="#" class="hover:underline" onclick="showPage('medicine')">Medicine</a></li>
+                            <li><a href="#" class="hover:underline" onclick="showPage('blogs')">Blogs</a></li>
                             <li><a href="#" class="hover:underline" onclick="showPage('feedback')">Feedback</a></li>
                             <li><a href="#" class="hover:underline" onclick="showPage('careers')">Careers</a></li>
                             <li><a href="#" class="hover:underline" onclick="showPage('contact')">Contact</a></li>
@@ -1462,6 +1537,461 @@
     </footer>
     
     <script>
+        // Real-time communication with admin panel
+        class FrontendSync {
+            constructor() {
+                this.setupStorageListener();
+                this.checkAdminConnection();
+            }
+
+            setupStorageListener() {
+                // Listen for changes from admin panel
+                window.addEventListener('storage', (e) => {
+                    if (e.key && e.key.startsWith('nsg_')) {
+                        this.handleAdminChange(e.key, e.newValue);
+                    }
+                });
+
+                // Check for updates periodically
+                setInterval(() => {
+                    this.checkForUpdates();
+                }, 2000); // Check every 2 seconds for immediate updates
+            }
+
+            handleAdminChange(key, newValue) {
+                console.log('Admin change detected:', key);
+                
+                if (key === 'nsg_equipment' && newValue) {
+                    equipmentData = JSON.parse(newValue);
+                    updateEquipmentDisplay();
+                    this.showUpdateNotification('Equipment updated');
+                }
+                
+                if (key === 'nsg_medicine' && newValue) {
+                    medicineData = JSON.parse(newValue);
+                    updateMedicineDisplay();
+                    this.showUpdateNotification('Medicine updated');
+                }
+                
+                if (key === 'nsg_blogs' && newValue) {
+                    blogData = JSON.parse(newValue);
+                    updateBlogDisplay();
+                    this.showUpdateNotification('New blog posts available');
+                }
+            }
+
+            checkForUpdates() {
+                const lastUpdate = localStorage.getItem('nsg_last_update');
+                if (lastUpdate && lastUpdate !== this.lastKnownUpdate) {
+                    this.lastKnownUpdate = lastUpdate;
+                    loadAdminData();
+                }
+            }
+
+            checkAdminConnection() {
+                setInterval(() => {
+                    const heartbeat = localStorage.getItem('nsg_admin_heartbeat');
+                    const now = Date.now();
+                    const adminActive = heartbeat && (now - parseInt(heartbeat)) < 10000; // Admin active within 10 seconds
+                    
+                    this.updateConnectionStatus(adminActive);
+                }, 5000);
+            }
+
+            updateConnectionStatus(isConnected) {
+                // You can add a connection indicator here if needed
+                if (isConnected && !this.wasConnected) {
+                    console.log('Admin panel connected');
+                    this.wasConnected = true;
+                } else if (!isConnected && this.wasConnected) {
+                    console.log('Admin panel disconnected');
+                    this.wasConnected = false;
+                }
+            }
+
+            showUpdateNotification(message) {
+                // Create a temporary notification
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+                notification.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-sync-alt mr-2"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Animate in
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                }, 100);
+                
+                // Animate out and remove
+                setTimeout(() => {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
+
+            // Report activity to admin panel
+            reportActivity(type, data) {
+                const activity = {
+                    type,
+                    ...data,
+                    timestamp: new Date().toISOString(),
+                    source: 'frontend'
+                };
+                
+                localStorage.setItem('nsg_frontend_activity', JSON.stringify(activity));
+            }
+        }
+
+        // Global data storage for real-time updates
+        let equipmentData = [];
+        let medicineData = [];
+        let blogData = [];
+        let frontendSync;
+
+        // Load data from localStorage (admin updates)
+        function loadAdminData() {
+            const storedEquipment = localStorage.getItem('nsg_equipment');
+            const storedMedicine = localStorage.getItem('nsg_medicine');
+            const storedBlogs = localStorage.getItem('nsg_blogs');
+            
+            if (storedEquipment) {
+                equipmentData = JSON.parse(storedEquipment);
+                updateEquipmentDisplay();
+            }
+            
+            if (storedMedicine) {
+                medicineData = JSON.parse(storedMedicine);
+                updateMedicineDisplay();
+            }
+            
+            if (storedBlogs) {
+                blogData = JSON.parse(storedBlogs);
+                updateBlogDisplay();
+            }
+        }
+
+        // Update equipment display
+        function updateEquipmentDisplay() {
+            const catalogueGrid = document.getElementById('products-grid');
+            const dynamicEquipmentSection = document.getElementById('dynamic-equipment');
+            
+            // Create dynamic equipment section if it doesn't exist
+            if (!dynamicEquipmentSection && catalogueGrid) {
+                const dynamicSection = document.createElement('div');
+                dynamicSection.id = 'dynamic-equipment';
+                dynamicSection.innerHTML = `
+                    <div class="col-span-full mb-8">
+                        <div class="bg-gradient-to-r from-green-500 to-blue-600 text-white p-6 rounded-lg">
+                            <h2 class="text-2xl font-bold mb-2">
+                                <i class="fas fa-bolt mr-2"></i>
+                                Real-time Equipment (Admin Managed)
+                            </h2>
+                            <p>Equipment added and managed by admin appears here instantly</p>
+                        </div>
+                    </div>
+                    <div id="real-time-equipment-grid" class="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                        <!-- Dynamic equipment will be loaded here -->
+                    </div>
+                `;
+                catalogueGrid.insertBefore(dynamicSection, catalogueGrid.firstChild);
+            }
+            
+            const dynamicGrid = document.getElementById('real-time-equipment-grid');
+            if (!dynamicGrid) return;
+            
+            if (equipmentData.length === 0) {
+                dynamicGrid.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <div class="bg-gray-50 rounded-lg p-8">
+                            <i class="fas fa-box-open text-4xl text-gray-400 mb-4"></i>
+                            <h3 class="text-xl font-semibold text-gray-600 mb-2">No Equipment Available</h3>
+                            <p class="text-gray-500">Admin hasn't added any equipment yet. Check back later!</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            dynamicGrid.innerHTML = equipmentData.map(equipment => `
+                <div class="product-card bg-white rounded-lg shadow-sm border border-gray-100 p-6 transform hover:scale-105 transition-all duration-300" data-category="${equipment.category}">
+                    <div class="bg-gradient-to-br from-green-50 to-blue-50 rounded-lg p-4 mb-4 flex justify-center">
+                        <i class="fas fa-${getCategoryIcon(equipment.category)} text-4xl text-green-600"></i>
+                    </div>
+                    <div class="flex items-start justify-between mb-2">
+                        <h3 class="text-xl font-semibold text-blue-800">${equipment.name}</h3>
+                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">NEW</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">${equipment.description || 'High-quality medical equipment for professional use.'}</p>
+                    <div class="mb-4">
+                        <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">
+                            ${equipment.category.charAt(0).toUpperCase() + equipment.category.slice(1)}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-bold text-green-600">KSh ${equipment.price}</span>
+                        <div class="flex items-center">
+                            <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg hover:bg-gray-300">-</button>
+                            <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                            <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg hover:bg-gray-300">+</button>
+                        </div>
+                    </div>
+                    <button onclick="orderEquipment('${equipment.name}', ${equipment.price})" 
+                            class="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white py-2 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-shopping-cart mr-2"></i>Order Now
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Helper function to get category icons
+        function getCategoryIcon(category) {
+            const icons = {
+                'bandages': 'band-aid',
+                'gloves': 'hand-paper',
+                'syringes': 'syringe',
+                'catheters': 'tubes',
+                'diagnostic': 'stethoscope',
+                'surgical': 'cut',
+                'lab': 'vial',
+                'monitors': 'heartbeat',
+                'respiratory': 'lungs',
+                'mobility': 'wheelchair',
+                'general': 'medical',
+                'default': 'medical'
+            };
+            return icons[category] || icons['default'];
+        }
+
+        // Order equipment function
+        function orderEquipment(name, price) {
+            // Report activity to admin
+            if (window.frontendSync) {
+                window.frontendSync.reportActivity('order', {
+                    product: name,
+                    price: price,
+                    type: 'equipment'
+                });
+            }
+            
+            const subject = `Equipment Order - ${name}`;
+            const body = `Dear NSG Health Team,%0D%0A%0D%0AI would like to order the following equipment:%0D%0A%0D%0AEquipment: ${encodeURIComponent(name)}%0D%0APrice: KSh ${price}%0D%0AQuantity: 1%0D%0A%0D%0APlease confirm availability and delivery details.%0D%0A%0D%0AThank you,%0D%0A[Your Name]%0D%0A[Your Phone]%0D%0A[Your Location]`;
+            
+            window.location.href = `mailto:docnsghealth@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+        }
+
+        // Update medicine display
+        function updateMedicineDisplay() {
+            const medicineGrid = document.getElementById('medicine-grid');
+            
+            if (medicineData.length === 0) {
+                medicineGrid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                        <i class="fas fa-pills text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">No Medicine Yet</h3>
+                        <p class="text-gray-500">Medicine types will be added by the admin soon.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            medicineGrid.innerHTML = medicineData.map(medicine => `
+                <div class="product-card bg-white rounded-lg shadow-sm border border-gray-100 p-6" data-category="${medicine.category}">
+                    <div class="bg-green-50 rounded-lg p-4 mb-4 flex justify-center">
+                        ${medicine.image ? 
+                            `<img src="${medicine.image}" alt="${medicine.name}" class="w-16 h-16 object-cover rounded">` :
+                            `<i class="fas fa-pills text-4xl text-green-600"></i>`
+                        }
+                    </div>
+                    <h3 class="text-xl font-semibold text-green-800 mb-2">${medicine.name}</h3>
+                    <p class="text-gray-600 text-sm mb-4">${medicine.description}</p>
+                    ${medicine.strength ? `<p class="text-sm text-gray-500 mb-2">Strength: ${medicine.strength}</p>` : ''}
+                    ${medicine.manufacturer ? `<p class="text-sm text-gray-500 mb-4">By: ${medicine.manufacturer}</p>` : ''}
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-lg font-bold text-green-800">KSh ${medicine.price}</span>
+                        <div class="flex items-center">
+                            <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-l-lg">-</button>
+                            <span class="bg-gray-100 w-10 h-8 flex items-center justify-center">1</span>
+                            <button class="bg-gray-200 text-gray-700 w-8 h-8 rounded-r-lg">+</button>
+                        </div>
+                    </div>
+                    <button class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg transition-colors" onclick="orderMedicine('${medicine.name}', '${medicine.price}')">Order Now</button>
+                </div>
+            `).join('');
+        }
+
+        // Update blog display
+        function updateBlogDisplay() {
+            const blogsGrid = document.getElementById('blogs-grid');
+            
+            if (blogData.length === 0) {
+                blogsGrid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                        <i class="fas fa-blog text-6xl text-gray-300 mb-4"></i>
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">No Blogs Yet</h3>
+                        <p class="text-gray-500">Blog posts will be added by the admin soon.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            blogsGrid.innerHTML = blogData.map(blog => `
+                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="h-48 bg-gray-200 overflow-hidden">
+                        ${blog.image ? 
+                            `<img src="${blog.image}" alt="${blog.title}" class="w-full h-full object-cover">` :
+                            `<div class="w-full h-full bg-blue-100 flex items-center justify-center">
+                                <i class="fas fa-blog text-4xl text-blue-600"></i>
+                            </div>`
+                        }
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">${blog.title}</h3>
+                        <p class="text-gray-600 mb-4">${blog.excerpt}</p>
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span>By ${blog.author}</span>
+                            <span>${new Date(blog.publishedAt).toLocaleDateString()}</span>
+                        </div>
+                        ${blog.tags && blog.tags.length > 0 ? 
+                            `<div class="flex flex-wrap gap-2 mb-4">
+                                ${blog.tags.map(tag => `<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">${tag}</span>`).join('')}
+                            </div>` : ''
+                        }
+                        <button onclick="readBlog('${blog.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors w-full">Read More</button>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        // Medicine filtering
+        function filterMedicine() {
+            const searchTerm = document.getElementById('medicineSearch').value.toLowerCase();
+            const category = document.getElementById('medicineCategory').value;
+            const cards = document.querySelectorAll('#medicine-grid .product-card');
+            
+            cards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const description = card.querySelector('p').textContent.toLowerCase();
+                const cardCategory = card.dataset.category;
+                
+                const matchesSearch = name.includes(searchTerm) || description.includes(searchTerm);
+                const matchesCategory = !category || cardCategory === category;
+                
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Blog filtering
+        function filterBlogs() {
+            const searchTerm = document.getElementById('blogSearch').value.toLowerCase();
+            const cards = document.querySelectorAll('#blogs-grid article');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const excerpt = card.querySelector('p').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || excerpt.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Order medicine function
+        function orderMedicine(name, price) {
+            // Report activity to admin
+            if (window.frontendSync) {
+                window.frontendSync.reportActivity('order', {
+                    product: name,
+                    price: price,
+                    type: 'medicine'
+                });
+            }
+            
+            const subject = `Medicine Order - ${name}`;
+            const body = `Dear NSG Health Team,%0D%0A%0D%0AI would like to order the following medicine:%0D%0A%0D%0AMedicine: ${encodeURIComponent(name)}%0D%0APrice: KSh ${price}%0D%0AQuantity: 1%0D%0A%0D%0APlease confirm availability and delivery details.%0D%0A%0D%0AThank you,%0D%0A[Your Name]%0D%0A[Your Phone]%0D%0A[Your Location]`;
+            
+            window.location.href = `mailto:docnsghealth@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`;
+        }
+
+        // Read blog function
+        function readBlog(blogId) {
+            const blog = blogData.find(b => b.id === blogId);
+            if (blog) {
+                // Create a modal or new page to display the full blog content
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+                modal.innerHTML = `
+                    <div class="bg-white rounded-lg max-w-4xl max-h-90vh overflow-y-auto">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="text-2xl font-bold text-gray-800">${blog.title}</h2>
+                                <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                                    <i class="fas fa-times text-2xl"></i>
+                                </button>
+                            </div>
+                            ${blog.image ? `<img src="${blog.image}" alt="${blog.title}" class="w-full h-64 object-cover rounded-lg mb-4">` : ''}
+                            <div class="flex items-center justify-between text-sm text-gray-500 mb-6">
+                                <span>By ${blog.author}</span>
+                                <span>${new Date(blog.publishedAt).toLocaleDateString()}</span>
+                            </div>
+                            <div class="prose max-w-none">
+                                ${blog.content.replace(/\n/g, '<br>')}
+                            </div>
+                            ${blog.tags && blog.tags.length > 0 ? 
+                                `<div class="flex flex-wrap gap-2 mt-6 pt-6 border-t">
+                                    ${blog.tags.map(tag => `<span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">${tag}</span>`).join('')}
+                                </div>` : ''
+                            }
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            }
+        }
+
+        // Add event listeners for search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize real-time sync system
+            frontendSync = new FrontendSync();
+            window.frontendSync = frontendSync;
+            
+            // Load admin data on page load
+            loadAdminData();
+            
+            // Set up periodic updates (every 5 seconds)
+            setInterval(loadAdminData, 5000);
+            
+            // Add event listeners for medicine search
+            const medicineSearch = document.getElementById('medicineSearch');
+            const medicineCategory = document.getElementById('medicineCategory');
+            
+            if (medicineSearch) {
+                medicineSearch.addEventListener('input', filterMedicine);
+            }
+            
+            if (medicineCategory) {
+                medicineCategory.addEventListener('change', filterMedicine);
+            }
+            
+            // Add event listeners for blog search
+            const blogSearch = document.getElementById('blogSearch');
+            if (blogSearch) {
+                blogSearch.addEventListener('input', filterBlogs);
+            }
+        });
+
         // Mobile menu toggle
         document.getElementById('mobileMenuButton').addEventListener('click', function() {
             const menu = document.getElementById('mobileMenu');
@@ -1483,6 +2013,11 @@
             
             // Scroll to top
             window.scrollTo(0, 0);
+            
+            // Load fresh data when switching to medicine or blogs page
+            if (pageId === 'medicine' || pageId === 'blogs') {
+                loadAdminData();
+            }
         }
         
         // Scroll to top button
@@ -1540,6 +2075,17 @@
             const phone = formData.get('phone');
             const email = formData.get('email');
             
+            // Report activity to admin
+            if (window.frontendSync) {
+                window.frontendSync.reportActivity('appointment', {
+                    name: name,
+                    service: service,
+                    date: date,
+                    time: time,
+                    location: location
+                });
+            }
+            
             // Create mailto URL
             const subject = `Appointment Booking - ${service}`;
             const body = `Dear NSG Health Team,%0D%0A%0D%0AI would like to book an appointment with the following details:%0D%0A%0D%0AService: ${service}%0D%0APreferred Date: ${date}%0D%0APreferred Time: ${time}%0D%0ALocation: ${encodeURIComponent(location)}%0D%0A%0D%0APatient Information:%0D%0AName: ${name}%0D%0APhone: ${phone}%0D%0AEmail: ${email || 'Not provided'}%0D%0A%0D%0AAdditional Notes:%0D%0A${encodeURIComponent(notes || 'None')}%0D%0A%0D%0APlease confirm this appointment at your earliest convenience.%0D%0A%0D%0AThank you,%0D%0A${name}`;
@@ -1593,6 +2139,16 @@
             const message = formData.get('message');
             const suggestions = formData.get('suggestions');
             
+            // Report activity to admin
+            if (window.frontendSync) {
+                window.frontendSync.reportActivity('feedback', {
+                    name: name,
+                    service: service,
+                    rating: rating,
+                    message: message.substring(0, 100) + '...' // Preview of message
+                });
+            }
+            
             // Create mailto URL with feedback data
             const subject = `Feedback from ${name} - ${service}`;
             const body = `Name: ${name}%0D%0AEmail: ${email}%0D%0AService Used: ${service}%0D%0ARating: ${rating}/5 stars%0D%0A%0D%0AFeedback:%0D%0A${encodeURIComponent(message)}%0D%0A%0D%0ASuggestions:%0D%0A${encodeURIComponent(suggestions || 'None')}`;
@@ -1644,44 +2200,11 @@
         }
 
         // Set minimum date for booking to today
-        document.addEventListener('DOMContentLoaded', function() {
-            const dateInput = document.getElementById('date');
-            if (dateInput) {
-                const today = new Date().toISOString().split('T')[0];
-                dateInput.setAttribute('min', today);
-            }
-        });
-
-        // Form submissions (simulated)
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Simulate form submission
-            setTimeout(() => {
-                document.getElementById('bookingSuccess').classList.remove('hidden');
-                this.reset();
-                
-                // Hide success message after 5 seconds
-                setTimeout(() => {
-                    document.getElementById('bookingSuccess').classList.add('hidden');
-                }, 5000);
-            }, 1000);
-        });
-        
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Simulate form submission
-            setTimeout(() => {
-                document.getElementById('contactSuccess').classList.remove('hidden');
-                this.reset();
-                
-                // Hide success message after 5 seconds
-                setTimeout(() => {
-                    document.getElementById('contactSuccess').classList.add('hidden');
-                }, 5000);
-            }, 1000);
-        });
+        const dateInput = document.getElementById('date');
+        if (dateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('min', today);
+        }
         
         // Category filtering
         function filterCategory(category) {
