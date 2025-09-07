@@ -1101,13 +1101,20 @@
 
         // Enhanced load data with real-time updates
         function loadData() {
+            console.log('Loading data...');
+            
             const storedEquipment = localStorage.getItem('nsg_equipment');
             const storedMedicine = localStorage.getItem('nsg_medicine');
             const storedBlogs = localStorage.getItem('nsg_blogs');
             
+            console.log('Stored equipment:', storedEquipment);
+            
             if (storedEquipment) {
                 equipmentData = JSON.parse(storedEquipment);
+                console.log('Loaded equipment data:', equipmentData.length, 'items');
                 updateEquipmentList();
+            } else {
+                console.log('No stored equipment found');
             }
             
             if (storedMedicine) {
@@ -1280,49 +1287,169 @@
             // Initialize real-time sync
             realTimeSync = new RealTimeSync();
             
-            // Load data
-            loadData();
+            // Always initialize with equipment data first
+            const actualEquipment = [
+                {
+                    id: 'zinc-oxide-bandages',
+                    name: 'Zinc Oxide Bandages',
+                    category: 'bandages',
+                    description: 'Adhesive zinc oxide tapes for secure wound dressing.',
+                    price: 35,
+                    variants: '1 inch - KSh 35, 2 inch - KSh 75, 3 inch - KSh 90',
+                    image: ''
+                },
+                {
+                    id: 'transpore-tapes',
+                    name: 'Transpore Tapes',
+                    category: 'bandages',
+                    description: 'Breathable medical adhesive tapes. Pack of 12 rolls.',
+                    price: 80,
+                    variants: '1/2 inch - KSh 80, 1 inch - KSh 100, 2 inch - KSh 135',
+                    image: ''
+                },
+                {
+                    id: 'crepe-bandages',
+                    name: 'Crepe Bandages',
+                    category: 'bandages',
+                    description: 'Elastic crepe bandages for compression and support.',
+                    price: 22,
+                    variants: '2 inch - KSh 22, 3 inch - KSh 30, 4 inch - KSh 42, 6 inch - KSh 58',
+                    image: ''
+                },
+                {
+                    id: 'gauze-swabs',
+                    name: 'Gauze Swabs',
+                    category: 'bandages',
+                    description: 'Sterile gauze swabs for wound cleaning and dressing.',
+                    price: 170,
+                    variants: '2×2 (100s) - KSh 170, 4×4 (100s) - KSh 380',
+                    image: ''
+                },
+                {
+                    id: 'latex-gloves',
+                    name: 'Latex Gloves',
+                    category: 'protective',
+                    description: 'Disposable latex examination gloves. Powder-free.',
+                    price: 420,
+                    variants: 'Small/Medium/Large (100s) - KSh 420',
+                    image: ''
+                },
+                {
+                    id: 'syringes',
+                    name: 'Syringes',
+                    category: 'injection',
+                    description: 'Disposable syringes with needles for medical procedures.',
+                    price: 400,
+                    variants: '1ml (100s) - KSh 400, 5ml (100s) - KSh 520, 10ml (100s) - KSh 680',
+                    image: ''
+                },
+                {
+                    id: 'iv-cannulas',
+                    name: 'IV Cannulas',
+                    category: 'injection',
+                    description: 'Sterile intravenous cannulas for fluid administration.',
+                    price: 14,
+                    variants: '18G/20G/22G/24G - KSh 14 each',
+                    image: ''
+                },
+                {
+                    id: 'foley-catheters',
+                    name: 'Foley Catheters',
+                    category: 'catheters',
+                    description: 'Sterile urinary catheters with balloon retention system.',
+                    price: 60,
+                    variants: '16Fr/18Fr/20Fr - KSh 60 each',
+                    image: ''
+                },
+                {
+                    id: 'stethoscopes',
+                    name: 'Stethoscopes',
+                    category: 'diagnostic',
+                    description: 'Professional-grade stethoscopes for cardiac and pulmonary examination.',
+                    price: 170,
+                    variants: 'Standard - KSh 170',
+                    image: ''
+                },
+                {
+                    id: 'bp-monitors',
+                    name: 'BP Monitors',
+                    category: 'diagnostic',
+                    description: 'Digital blood pressure monitors with cuff for accurate readings.',
+                    price: 2400,
+                    variants: 'Automatic Digital - KSh 4,800, Manual with Stethoscope - KSh 2,400',
+                    image: ''
+                },
+                {
+                    id: 'digital-thermometers',
+                    name: 'Digital Thermometers',
+                    category: 'diagnostic',
+                    description: 'Fast and accurate digital thermometers for temperature monitoring.',
+                    price: 150,
+                    variants: 'Oral/Underarm - KSh 150',
+                    image: ''
+                },
+                {
+                    id: 'surgical-supplies',
+                    name: 'Surgical Supplies',
+                    category: 'surgical',
+                    description: 'Essential surgical instruments and supplies for medical procedures.',
+                    price: 280,
+                    variants: 'Basic Instrument Set - KSh 1,300, Surgical Forceps - KSh 280, Surgical Scissors - KSh 350',
+                    image: ''
+                },
+                {
+                    id: 'surgical-blades',
+                    name: 'Surgical Blades',
+                    category: 'surgical',
+                    description: 'Sterile disposable surgical blades. Pack of 100 pieces.',
+                    price: 620,
+                    variants: 'Grade 23/24 - KSh 620',
+                    image: ''
+                },
+                {
+                    id: 'pregnancy-test-strips',
+                    name: 'Pregnancy Test Strips',
+                    category: 'lab',
+                    description: 'Rapid pregnancy test strips with high accuracy. Pack of 10.',
+                    price: 70,
+                    variants: 'Standard (10 strips) - KSh 70',
+                    image: ''
+                },
+                {
+                    id: 'blood-glucose-monitor',
+                    name: 'Blood Glucose Monitor',
+                    category: 'lab',
+                    description: 'Plusmed glucose monitor with test strips for diabetes management.',
+                    price: 380,
+                    variants: 'Monitor (10 strips) - KSh 380, Test Strips (100s) - KSh 850',
+                    image: ''
+                },
+                {
+                    id: 'urinalysis-test-strips',
+                    name: 'Urinalysis Test Strips',
+                    category: 'lab',
+                    description: '10-parameter urine test strips for comprehensive urinalysis. Pack of 100.',
+                    price: 125,
+                    variants: 'Standard (100 strips) - KSh 125',
+                    image: ''
+                }
+            ];
             
-            // Initialize with sample equipment if none exists
-            if (equipmentData.length === 0) {
-                const sampleEquipment = [
-                    {
-                        id: 'eq1',
-                        name: 'Digital Blood Pressure Monitor',
-                        category: 'diagnostic',
-                        description: 'Automatic digital blood pressure monitor with large LCD display and memory function.',
-                        price: 3500,
-                        image: ''
-                    },
-                    {
-                        id: 'eq2',
-                        name: 'Pulse Oximeter',
-                        category: 'diagnostic',
-                        description: 'Fingertip pulse oximeter for measuring oxygen saturation and pulse rate.',
-                        price: 1200,
-                        image: ''
-                    },
-                    {
-                        id: 'eq3',
-                        name: 'Digital Thermometer',
-                        category: 'diagnostic',
-                        description: 'Fast and accurate digital thermometer with flexible tip.',
-                        price: 450,
-                        image: ''
-                    }
-                ];
-                
-                equipmentData = sampleEquipment;
-                realTimeSync.syncToFrontend('equipment', equipmentData);
-                updateEquipmentList();
-                updateDashboard();
-                
-                // Log the initialization
-                logActivity('system', { message: 'Sample equipment data initialized' });
+            // Check if we need to initialize data
+            const storedEquipment = localStorage.getItem('nsg_equipment');
+            if (!storedEquipment || JSON.parse(storedEquipment).length === 0) {
+                console.log('Initializing equipment data...');
+                equipmentData = actualEquipment;
+                localStorage.setItem('nsg_equipment', JSON.stringify(equipmentData));
+                console.log('Equipment data initialized with', equipmentData.length, 'items');
             }
             
-            // Set equipment count
-            document.getElementById('equipmentCount').textContent = equipmentData.length;
+            // Load all data
+            loadData();
+            
+            // Force update the equipment list
+            updateEquipmentList();
+            updateCounts();
             
             // Setup image preview handlers
             setupImagePreviewHandlers();
