@@ -290,9 +290,12 @@
                 <div class="flex items-center justify-between">
                     <label class="flex items-center text-blue-100">
                         <input type="checkbox" id="modalRememberMe" class="mr-2 rounded">
-                        <span class="text-sm">Remember me</span>
+                        <span class="text-sm">Keep me logged in</span>
                     </label>
-                    <div class="text-xs text-blue-200">Session timeout: 1 hour</div>
+                    <div class="text-xs text-blue-200">
+                        <div>Session timeout: 1 hour</div>
+                        <div class="text-xs text-blue-300 mt-1">Uncheck to require re-auth on return</div>
+                    </div>
                 </div>
 
                 <button type="submit" class="w-full bg-white text-blue-600 font-semibold py-3 rounded-lg hover:bg-blue-50 transition-colors">
@@ -301,7 +304,7 @@
             </form>
 
             <div class="mt-6 text-center">
-                <a href="index.html" class="text-blue-200 hover:text-white text-sm">
+                <a href="#" onclick="navigateBackToWebsite()" class="text-blue-200 hover:text-white text-sm">
                     <i class="fas fa-arrow-left mr-2"></i>Back to Website
                 </a>
             </div>
@@ -1133,7 +1136,7 @@
                 return originalShowSection.apply(this, args);
             };
 
-            // Monitor for authentication bypass attempts
+            // Monitor for authentication bypass attempts and session tampering
             setInterval(function() {
                 const authModal = document.getElementById('authModal');
                 const adminContent = document.getElementById('adminContent');
@@ -1143,10 +1146,60 @@
                     console.warn('Authentication bypass attempt detected');
                     showAuthModal();
                 }
-            }, 2000);
+                
+                // Validate session integrity
+                const session = localStorage.getItem('nsg_admin_session');
+                if (session && adminContent.classList.contains('authenticated')) {
+                    try {
+                        const sessionData = JSON.parse(session);
+                        
+                        // Validate session structure
+                        if (!sessionData.username || !sessionData.loginTime || !sessionData.role) {
+                            console.warn('Invalid session data detected');
+                            localStorage.removeItem('nsg_admin_session');
+                            showAuthModal();
+                            showNotification('Invalid session detected. Please re-authenticate.', 'error');
+                        }
+                        
+                        // Check if user exists in valid users
+                        if (!adminUsers[sessionData.username]) {
+                            console.warn('Invalid user in session');
+                            localStorage.removeItem('nsg_admin_session');
+                            showAuthModal();
+                            showNotification('Invalid user session. Please re-authenticate.', 'error');
+                        }
+                    } catch(e) {
+                        console.warn('Corrupted session data');
+                        localStorage.removeItem('nsg_admin_session');
+                        showAuthModal();
+                        showNotification('Corrupted session. Please re-authenticate.', 'error');
+                    }
+                }
+            }, 3000); // Check every 3 seconds
 
-            // Initial authentication check
+            // Initial authentication check - enhanced for navigation security
             setTimeout(() => {
+                // Check if user came from another page (referrer check)
+                const referrer = document.referrer;
+                const currentDomain = window.location.origin;
+                const isFromOtherPage = referrer && referrer.startsWith(currentDomain) && !referrer.includes('admin.html');
+                
+                // If user navigated from another page, clear any existing session (unless remember me)
+                if (isFromOtherPage) {
+                    const session = localStorage.getItem('nsg_admin_session');
+                    if (session) {
+                        const sessionData = JSON.parse(session);
+                        if (!sessionData.rememberMe) {
+                            console.log('User navigated from another page, clearing session');
+                            logActivity('session_return_clear', { 
+                                reason: 'returned_from_other_page', 
+                                referrer: referrer 
+                            });
+                            localStorage.removeItem('nsg_admin_session');
+                        }
+                    }
+                }
+                
                 const isAuthenticated = checkAuthentication();
                 console.log('Initial authentication check:', isAuthenticated);
                 
@@ -1160,6 +1213,11 @@
                             basicInitialization();
                         }
                     }, 100);
+                } else {
+                    // Not authenticated, show login modal
+                    if (isFromOtherPage) {
+                        showNotification('Please re-authenticate to access admin panel', 'info');
+                    }
                 }
             }, 500);
         });
@@ -1222,10 +1280,56 @@
             }
         }
 
+        // Page navigation handlers - clear session when user navigates away
+        window.addEventListener('beforeunload', function() {
+            // Clear session when user leaves the admin page
+            // This ensures they need to re-authenticate when they return
+            const session = localStorage.getItem('nsg_admin_session');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                if (!sessionData.rememberMe) {
+                    logActivity('session_navigation_clear', { reason: 'page_navigation' });
+                    localStorage.removeItem('nsg_admin_session');
+                }
+            }
+        });
+
+        // Handle browser back/forward navigation
+        window.addEventListener('pagehide', function() {
+            // Clear session when page is unloaded
+            const session = localStorage.getItem('nsg_admin_session');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                if (!sessionData.rememberMe) {
+                    localStorage.removeItem('nsg_admin_session');
+                }
+            }
+        });
+
+        // Handle when user navigates back to admin page
+        window.addEventListener('pageshow', function(event) {
+            // If page is restored from cache, force authentication check
+            if (event.persisted) {
+                // Page was loaded from cache, force re-authentication
+                localStorage.removeItem('nsg_admin_session');
+                showAuthModal();
+                showNotification('Please re-authenticate to access admin panel', 'info');
+            }
+        });
+
         // Page visibility change handler - pause timers when tab is hidden
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
                 if (sessionTimer) clearInterval(sessionTimer);
+                // When tab becomes hidden, clear session if not remember me
+                const session = localStorage.getItem('nsg_admin_session');
+                if (session) {
+                    const sessionData = JSON.parse(session);
+                    if (!sessionData.rememberMe) {
+                        logActivity('session_tab_switch_clear', { reason: 'tab_hidden' });
+                        localStorage.removeItem('nsg_admin_session');
+                    }
+                }
             } else {
                 // Recheck authentication when tab becomes visible
                 const session = localStorage.getItem('nsg_admin_session');
@@ -1242,6 +1346,10 @@
                             startSessionMonitoring(sessionData);
                         }
                     }
+                } else {
+                    // No session found, force authentication
+                    showAuthModal();
+                    showNotification('Session cleared. Please re-authenticate.', 'info');
                 }
             }
         });
@@ -2100,7 +2208,29 @@
 
         // Utility functions
         function previewWebsite() {
+            // Clear session when navigating to preview (unless remember me is checked)
+            const session = localStorage.getItem('nsg_admin_session');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                if (!sessionData.rememberMe) {
+                    logActivity('session_preview_clear', { reason: 'preview_navigation' });
+                    localStorage.removeItem('nsg_admin_session');
+                }
+            }
             window.open('index.html', '_blank');
+        }
+
+        function navigateBackToWebsite() {
+            // Clear session when navigating back to website (unless remember me is checked)
+            const session = localStorage.getItem('nsg_admin_session');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                if (!sessionData.rememberMe) {
+                    logActivity('session_navigate_back', { reason: 'back_to_website' });
+                    localStorage.removeItem('nsg_admin_session');
+                }
+            }
+            window.location.href = 'index.html';
         }
 
         function logout() {
@@ -2108,11 +2238,17 @@
                 // Log the logout activity
                 logActivity('logout');
                 
+                // Clear timers
+                clearTimeout(warningTimer);
+                clearInterval(sessionTimer);
+                
                 // Clear session data
                 localStorage.removeItem('nsg_admin_session');
                 
-                // Redirect to login
-                window.location.href = 'login.html';
+                // Show modal again
+                showAuthModal();
+                
+                showNotification('Logged out successfully', 'info');
             }
         }
 
