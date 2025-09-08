@@ -54,9 +54,108 @@
             font-size: 14px;
             z-index: 1000;
         }
+        
+        /* Mobile responsive enhancements */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100vh;
+                z-index: 50;
+                background: white;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+            .mobile-overlay.active {
+                display: block;
+            }
+            .notification {
+                right: 10px;
+                left: 10px;
+                transform: translateY(-100px);
+            }
+            .notification.show {
+                transform: translateY(0);
+            }
+            .real-time-indicator {
+                bottom: 10px;
+                left: 10px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            .responsive-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .responsive-flex {
+                flex-direction: column !important;
+            }
+            .responsive-form {
+                padding: 1rem !important;
+            }
+        }
+        
+        /* Improved mobile forms */
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .equipment-item {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+            }
+            .equipment-actions {
+                margin-top: 1rem;
+                align-self: stretch;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+
+        /* Enhanced authentication check */
+        .auth-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(59, 130, 246, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
+    <!-- Authentication Loading Screen -->
+    <div id="authLoading" class="auth-loading">
+        <div class="text-center text-white">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mb-4 mx-auto"></div>
+            <p class="text-xl">Checking authentication...</p>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div id="mobileOverlay" class="mobile-overlay"></div>
+
     <!-- Notification Container -->
     <div id="notification" class="notification bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
         <span id="notificationText">Changes saved successfully!</span>
@@ -69,9 +168,14 @@
     </div>
 
     <!-- Header -->
-    <header class="bg-blue-800 text-white shadow-lg">
+    <header class="bg-blue-800 text-white shadow-lg relative z-30">
         <div class="container mx-auto px-4 py-4">
             <div class="flex items-center justify-between">
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden text-white p-2 rounded-lg hover:bg-blue-700">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+                
                 <div class="flex items-center space-x-3">
                     <!-- NSG Health Logo -->
                     <div class="relative">
@@ -80,18 +184,18 @@
                             <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
                         </svg>
                     </div>
-                    <div>
-                        <h1 class="text-2xl font-bold">NSG Health Admin</h1>
-                        <p class="text-blue-200 text-sm">Content Management System</p>
+                    <div class="hidden sm:block">
+                        <h1 class="text-xl md:text-2xl font-bold">NSG Health Admin</h1>
+                        <p class="text-blue-200 text-xs md:text-sm">Content Management System</p>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-blue-200" id="currentUser">Welcome, Admin</span>
-                    <button onclick="previewWebsite()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-eye mr-2"></i>Preview Website
+                <div class="flex items-center space-x-2 md:space-x-4">
+                    <span class="text-blue-200 text-sm md:text-base hidden sm:block" id="currentUser">Welcome, Admin</span>
+                    <button onclick="previewWebsite()" class="bg-blue-600 hover:bg-blue-700 px-2 md:px-4 py-2 rounded-lg transition-colors text-sm">
+                        <i class="fas fa-eye mr-1 md:mr-2"></i><span class="hidden sm:inline">Preview</span>
                     </button>
-                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 px-2 md:px-4 py-2 rounded-lg transition-colors text-sm">
+                        <i class="fas fa-sign-out-alt mr-1 md:mr-2"></i><span class="hidden sm:inline">Logout</span>
                     </button>
                 </div>
             </div>
@@ -100,7 +204,7 @@
 
     <div class="flex">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg min-h-screen">
+        <aside id="sidebar" class="sidebar w-64 bg-white shadow-lg min-h-screen">
             <nav class="p-4">
                 <ul class="space-y-2">
                     <li>
@@ -143,70 +247,70 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 p-6">
+        <main class="main-content flex-1 p-4 md:p-6 md:ml-0">
             <!-- Dashboard Section -->
             <div id="dashboard" class="admin-section active">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
                 
                 <!-- Stats Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center">
-                            <div class="bg-blue-100 p-3 rounded-full">
-                                <i class="fas fa-medkit text-blue-600 text-2xl"></i>
+                <div class="responsive-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                    <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+                        <div class="responsive-flex flex items-center">
+                            <div class="bg-blue-100 p-3 rounded-full mb-2 md:mb-0">
+                                <i class="fas fa-medkit text-blue-600 text-xl md:text-2xl"></i>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-700">Equipment Items</h3>
-                                <p class="text-3xl font-bold text-blue-600" id="equipmentCount">24</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center">
-                            <div class="bg-green-100 p-3 rounded-full">
-                                <i class="fas fa-pills text-green-600 text-2xl"></i>
-                            </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-700">Medicine Types</h3>
-                                <p class="text-3xl font-bold text-green-600" id="medicineCount">0</p>
+                            <div class="md:ml-4">
+                                <h3 class="text-base md:text-lg font-semibold text-gray-700">Equipment Items</h3>
+                                <p class="text-2xl md:text-3xl font-bold text-blue-600" id="equipmentCount">0</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center">
-                            <div class="bg-purple-100 p-3 rounded-full">
-                                <i class="fas fa-blog text-purple-600 text-2xl"></i>
+                    <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+                        <div class="responsive-flex flex items-center">
+                            <div class="bg-green-100 p-3 rounded-full mb-2 md:mb-0">
+                                <i class="fas fa-pills text-green-600 text-xl md:text-2xl"></i>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-700">Blog Posts</h3>
-                                <p class="text-3xl font-bold text-purple-600" id="blogCount">0</p>
+                            <div class="md:ml-4">
+                                <h3 class="text-base md:text-lg font-semibold text-gray-700">Medicine Types</h3>
+                                <p class="text-2xl md:text-3xl font-bold text-green-600" id="medicineCount">0</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center">
-                            <div class="bg-yellow-100 p-3 rounded-full">
-                                <i class="fas fa-calendar text-yellow-600 text-2xl"></i>
+                    <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+                        <div class="responsive-flex flex items-center">
+                            <div class="bg-purple-100 p-3 rounded-full mb-2 md:mb-0">
+                                <i class="fas fa-blog text-purple-600 text-xl md:text-2xl"></i>
                             </div>
-                            <div class="ml-4">
-                                <h3 class="text-lg font-semibold text-gray-700">Appointments</h3>
-                                <p class="text-3xl font-bold text-yellow-600" id="appointmentCount">0</p>
+                            <div class="md:ml-4">
+                                <h3 class="text-base md:text-lg font-semibold text-gray-700">Blog Posts</h3>
+                                <p class="text-2xl md:text-3xl font-bold text-purple-600" id="blogCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+                        <div class="responsive-flex flex items-center">
+                            <div class="bg-yellow-100 p-3 rounded-full mb-2 md:mb-0">
+                                <i class="fas fa-calendar text-yellow-600 text-xl md:text-2xl"></i>
+                            </div>
+                            <div class="md:ml-4">
+                                <h3 class="text-base md:text-lg font-semibold text-gray-700">Appointments</h3>
+                                <p class="text-2xl md:text-3xl font-bold text-yellow-600" id="appointmentCount">0</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h3>
+                <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+                    <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4">Recent Activity</h3>
                     <div id="recentActivity" class="space-y-3">
                         <div class="flex items-center p-3 bg-gray-50 rounded-lg">
                             <i class="fas fa-info-circle text-blue-500 mr-3"></i>
-                            <span class="text-gray-600">Welcome to NSG Health Admin Panel</span>
-                            <span class="text-sm text-gray-400 ml-auto">Just now</span>
+                            <span class="text-gray-600 text-sm md:text-base">Welcome to NSG Health Admin Panel</span>
+                            <span class="text-xs md:text-sm text-gray-400 ml-auto">Just now</span>
                         </div>
                     </div>
                 </div>
@@ -214,19 +318,19 @@
 
             <!-- Equipment Management Section -->
             <div id="equipment" class="admin-section">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-gray-800">Equipment Management</h2>
-                    <button onclick="showAddEquipmentForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                        <i class="fas fa-plus mr-2"></i>Add New Equipment
+                <div class="responsive-flex flex justify-between items-center mb-6">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Equipment Management</h2>
+                    <button onclick="showAddEquipmentForm()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 md:px-4 py-2 rounded-lg transition-colors text-sm md:text-base">
+                        <i class="fas fa-plus mr-1 md:mr-2"></i>Add Equipment
                     </button>
                 </div>
 
                 <!-- Add/Edit Equipment Form -->
-                <div id="equipmentForm" class="bg-white rounded-lg shadow-md p-6 mb-6 hidden">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4" id="equipmentFormTitle">Add New Equipment</h3>
+                <div id="equipmentForm" class="bg-white rounded-lg shadow-md responsive-form p-4 md:p-6 mb-6 hidden">
+                    <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4" id="equipmentFormTitle">Add New Equipment</h3>
                     <form id="equipmentFormData">
                         <input type="hidden" id="equipmentId" name="id">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="form-grid grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                             <div>
                                 <label for="equipmentName" class="block text-gray-700 font-medium mb-2">Equipment Name</label>
                                 <input type="text" id="equipmentName" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
@@ -242,6 +346,12 @@
                                     <option value="diagnostic">Diagnostic Tools</option>
                                     <option value="surgical">Surgical Supplies</option>
                                     <option value="lab">Lab Testing</option>
+                                    <option value="protective">Protective Equipment</option>
+                                    <option value="injection">Injection Supplies</option>
+                                    <option value="monitors">Monitoring Devices</option>
+                                    <option value="respiratory">Respiratory Care</option>
+                                    <option value="mobility">Mobility Aids</option>
+                                    <option value="general">General Medical</option>
                                 </select>
                             </div>
                             <div class="md:col-span-2">
@@ -249,19 +359,24 @@
                                 <textarea id="equipmentDescription" name="description" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
                             </div>
                             <div>
-                                <label for="equipmentPrice" class="block text-gray-700 font-medium mb-2">Price (KSh)</label>
+                                <label for="equipmentPrice" class="block text-gray-700 font-medium mb-2">Base Price (KSh)</label>
                                 <input type="number" id="equipmentPrice" name="price" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                             </div>
                             <div>
+                                <label for="equipmentVariants" class="block text-gray-700 font-medium mb-2">Price Variants (Optional)</label>
+                                <input type="text" id="equipmentVariants" name="variants" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Small - KSh 35, Large - KSh 50">
+                                <p class="text-sm text-gray-500 mt-1">Comma-separated variants with prices</p>
+                            </div>
+                            <div class="md:col-span-2">
                                 <label for="equipmentImage" class="block text-gray-700 font-medium mb-2">Equipment Image</label>
                                 <input type="file" id="equipmentImage" name="image" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <p class="text-sm text-gray-500 mt-1">Upload an image file (JPG, PNG, etc.)</p>
+                                <p class="text-sm text-gray-500 mt-1">Upload an image file (JPG, PNG, etc.) - Max 5MB</p>
                                 <div id="equipmentImagePreview" class="mt-2 hidden">
                                     <img id="equipmentPreviewImg" src="" alt="Preview" class="preview-image rounded border">
                                 </div>
                             </div>
                         </div>
-                        <div class="flex justify-end space-x-4 mt-6">
+                        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
                             <button type="button" onclick="hideEquipmentForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">Save Equipment</button>
                         </div>
@@ -270,8 +385,8 @@
 
                 <!-- Equipment List -->
                 <div class="bg-white rounded-lg shadow-md">
-                    <div class="p-6 border-b border-gray-200">
-                        <h3 class="text-xl font-semibold text-gray-800">Current Equipment</h3>
+                    <div class="p-4 md:p-6 border-b border-gray-200">
+                        <h3 class="text-lg md:text-xl font-semibold text-gray-800">Current Equipment</h3>
                     </div>
                     <div id="equipmentList" class="divide-y divide-gray-200">
                         <!-- Equipment items will be loaded here -->
@@ -459,41 +574,59 @@
 
             <!-- Analytics Section -->
             <div id="analytics" class="admin-section">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Analytics</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Analytics & Reports</h2>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Popular Equipment</h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Zinc Oxide Bandages</span>
-                                <span class="text-blue-600 font-semibold">45 orders</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Latex Gloves</span>
-                                <span class="text-blue-600 font-semibold">38 orders</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Digital Thermometer</span>
-                                <span class="text-blue-600 font-semibold">32 orders</span>
+                    <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+                        <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4">Real-Time Equipment Status</h3>
+                        <div id="equipmentAnalytics" class="space-y-3">
+                            <div class="text-center text-gray-500 py-4">
+                                <i class="fas fa-chart-line text-3xl mb-2"></i>
+                                <p class="text-sm">Analytics will update based on actual orders</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Service Requests</h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Medical Consultation</span>
-                                <span class="text-green-600 font-semibold">28 requests</span>
+                    <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+                        <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4">Website Activity</h3>
+                        <div id="websiteAnalytics" class="space-y-3">
+                            <div class="text-center text-gray-500 py-4">
+                                <i class="fas fa-globe text-3xl mb-2"></i>
+                                <p class="text-sm">Real visitor data will appear here</p>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Medical Attention</span>
-                                <span class="text-green-600 font-semibold">22 requests</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Real Analytics Data -->
+                <div class="mt-8 bg-white rounded-lg shadow-md p-4 md:p-6">
+                    <h3 class="text-lg md:text-xl font-semibold text-gray-800 mb-4">Current System Status</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-600 text-2xl mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-green-800">System Online</h4>
+                                    <p class="text-green-600 text-sm">All services operational</p>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">Family Physician</span>
-                                <span class="text-green-600 font-semibold">15 requests</span>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-sync-alt text-blue-600 text-2xl mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-blue-800">Real-time Sync</h4>
+                                    <p class="text-blue-600 text-sm">Active and running</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-database text-purple-600 text-2xl mr-3"></i>
+                                <div>
+                                    <h4 class="font-semibold text-purple-800">Data Storage</h4>
+                                    <p class="text-purple-600 text-sm">Local & synchronized</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -505,6 +638,9 @@
     <script>
         // Authentication check
         function checkAuthentication() {
+            // Hide loading screen immediately
+            document.getElementById('authLoading').style.display = 'none';
+            
             const session = localStorage.getItem('nsg_admin_session');
             if (!session) {
                 window.location.href = 'login.html';
@@ -926,7 +1062,36 @@
             `).join('');
         }
 
-        // Form submissions
+        // Mobile menu functionality
+        function initializeMobileMenu() {
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.getElementById('sidebar');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            
+            if (mobileMenuBtn && sidebar && mobileOverlay) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    sidebar.classList.add('mobile-open');
+                    mobileOverlay.classList.add('active');
+                });
+                
+                mobileOverlay.addEventListener('click', function() {
+                    sidebar.classList.remove('mobile-open');
+                    mobileOverlay.classList.remove('active');
+                });
+                
+                // Close sidebar when clicking nav items on mobile
+                document.querySelectorAll('.admin-nav-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        if (window.innerWidth < 768) {
+                            sidebar.classList.remove('mobile-open');
+                            mobileOverlay.classList.remove('active');
+                        }
+                    });
+                });
+            }
+        }
+
+        // Equipment form submission handler with variants support
         document.getElementById('equipmentFormData').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -944,26 +1109,33 @@
                 }
             }
             
-            const equipmentData_item = {
+            const equipmentItem = {
                 id: formData.get('id') || Date.now().toString(),
                 name: formData.get('name'),
                 category: formData.get('category'),
                 description: formData.get('description'),
                 price: formData.get('price'),
+                variants: formData.get('variants') || '',
                 image: imageData
             };
             
             if (formData.get('id')) {
                 // Edit existing
                 const index = equipmentData.findIndex(item => item.id === formData.get('id'));
-                equipmentData[index] = equipmentData_item;
-                showNotification('Equipment updated successfully');
-                logActivity('equipment_edit', { name: equipmentData_item.name });
+                if (index !== -1) {
+                    // Preserve existing image if no new image uploaded
+                    if (!imageData && equipmentData[index].image) {
+                        equipmentItem.image = equipmentData[index].image;
+                    }
+                    equipmentData[index] = equipmentItem;
+                    showNotification('Equipment updated successfully');
+                    logActivity('equipment_edit', { name: equipmentItem.name });
+                }
             } else {
                 // Add new
-                equipmentData.push(equipmentData_item);
+                equipmentData.push(equipmentItem);
                 showNotification('Equipment added successfully');
-                logActivity('equipment_add', { name: equipmentData_item.name });
+                logActivity('equipment_add', { name: equipmentItem.name });
             }
             
             updateEquipmentList();
@@ -1066,12 +1238,77 @@
             syncToFrontend();
         });
 
-        // Update counts
+        // Update counts with real data
         function updateCounts() {
             document.getElementById('equipmentCount').textContent = equipmentData.length;
             document.getElementById('medicineCount').textContent = medicineData.length;
             document.getElementById('blogCount').textContent = blogData.length;
             document.getElementById('appointmentCount').textContent = appointmentsData.length;
+            
+            // Update real analytics
+            updateRealAnalytics();
+        }
+
+        // Update analytics with real data
+        function updateRealAnalytics() {
+            const activities = JSON.parse(localStorage.getItem('nsg_admin_activities') || '[]');
+            const orders = activities.filter(a => a.type === 'order');
+            
+            // Update equipment analytics
+            const equipmentAnalytics = document.getElementById('equipmentAnalytics');
+            if (orders.length > 0) {
+                const orderCounts = {};
+                orders.forEach(order => {
+                    orderCounts[order.product] = (orderCounts[order.product] || 0) + 1;
+                });
+                
+                const sortedOrders = Object.entries(orderCounts)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 5);
+                
+                equipmentAnalytics.innerHTML = sortedOrders.map(([product, count]) => `
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 text-sm">${product}</span>
+                        <span class="text-blue-600 font-semibold">${count} order${count > 1 ? 's' : ''}</span>
+                    </div>
+                `).join('');
+            } else {
+                equipmentAnalytics.innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fas fa-chart-line text-3xl mb-2"></i>
+                        <p class="text-sm">No orders yet - analytics will update with real data</p>
+                    </div>
+                `;
+            }
+            
+            // Update website analytics
+            const websiteAnalytics = document.getElementById('websiteAnalytics');
+            const totalActivities = activities.length;
+            const frontendActivities = activities.filter(a => a.source === 'frontend').length;
+            
+            if (totalActivities > 0) {
+                websiteAnalytics.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 text-sm">Total Activities</span>
+                        <span class="text-green-600 font-semibold">${totalActivities}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 text-sm">Website Interactions</span>
+                        <span class="text-green-600 font-semibold">${frontendActivities}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 text-sm">Admin Actions</span>
+                        <span class="text-green-600 font-semibold">${totalActivities - frontendActivities}</span>
+                    </div>
+                `;
+            } else {
+                websiteAnalytics.innerHTML = `
+                    <div class="text-center text-gray-500 py-4">
+                        <i class="fas fa-globe text-3xl mb-2"></i>
+                        <p class="text-sm">No website activity yet</p>
+                    </div>
+                `;
+            }
         }
 
         // Enhanced sync data to frontend (real-time updates)
@@ -1277,124 +1514,172 @@
             }
         }
 
-        // Initialize on page load
+        // Initialize on page load with enhanced authentication and mobile support
         document.addEventListener('DOMContentLoaded', function() {
             // Check authentication first
             if (!checkAuthentication()) {
                 return;
             }
             
+            // Initialize mobile menu
+            initializeMobileMenu();
+            
             // Initialize real-time sync
             realTimeSync = new RealTimeSync();
             
-            // Always initialize with equipment data first
-            const actualEquipment = [
+            // Always initialize with complete equipment data from index.html
+            const completeEquipmentData = [
                 {
                     id: 'zinc-oxide-bandages',
-                    name: 'Zinc Oxide Bandages',
+                    name: 'Zinc Oxide Bandage (ZOP)',
                     category: 'bandages',
-                    description: 'Adhesive zinc oxide tapes for secure wound dressing.',
+                    description: 'High-quality zinc oxide plaster bandages for secure wound dressing. Available in multiple sizes.',
                     price: 35,
-                    variants: '1 inch - KSh 35, 2 inch - KSh 75, 3 inch - KSh 90',
+                    variants: '1" x 4m - KSh 35, 2" x 4m - KSh 70, 3" x 4m - KSh 90, 4" x 4m - KSh 120, 6" x 4m - KSh 180',
                     image: ''
                 },
                 {
                     id: 'transpore-tapes',
-                    name: 'Transpore Tapes',
+                    name: 'Transpore Adhesive Tape',
                     category: 'bandages',
-                    description: 'Breathable medical adhesive tapes. Pack of 12 rolls.',
+                    description: 'Clear, breathable adhesive tape for securing dressings and medical devices.',
                     price: 80,
-                    variants: '1/2 inch - KSh 80, 1 inch - KSh 100, 2 inch - KSh 135',
+                    variants: '2.5cm x 5m - KSh 80, 5cm x 5m - KSh 140, 7.5cm x 5m - KSh 170',
                     image: ''
                 },
                 {
                     id: 'crepe-bandages',
-                    name: 'Crepe Bandages',
+                    name: 'Crepe Bandage with Clip',
                     category: 'bandages',
-                    description: 'Elastic crepe bandages for compression and support.',
+                    description: 'Elastic support bandages with clips for sprains, strains, and compression therapy.',
                     price: 22,
-                    variants: '2 inch - KSh 22, 3 inch - KSh 30, 4 inch - KSh 42, 6 inch - KSh 58',
+                    variants: '2" x 4.5m - KSh 22, 3" x 4.5m - KSh 28, 4" x 4.5m - KSh 38, 6" x 4.5m - KSh 56',
                     image: ''
                 },
                 {
                     id: 'gauze-swabs',
-                    name: 'Gauze Swabs',
+                    name: 'Gauze Swabs (Pack of 100)',
                     category: 'bandages',
-                    description: 'Sterile gauze swabs for wound cleaning and dressing.',
+                    description: 'Sterile and non-sterile gauze swabs for wound cleaning and dressing.',
                     price: 170,
-                    variants: '2×2 (100s) - KSh 170, 4×4 (100s) - KSh 380',
+                    variants: '3x3 Non-Sterile - KSh 170, 3x3 Sterile - KSh 400, 4x4 Non-Sterile - KSh 300, 4x4 Sterile - KSh 650',
                     image: ''
                 },
                 {
-                    id: 'latex-gloves',
-                    name: 'Latex Gloves',
-                    category: 'protective',
-                    description: 'Disposable latex examination gloves. Powder-free.',
+                    id: 'primapore-dressings',
+                    name: 'Primapore Adhesive Dressing',
+                    category: 'bandages',
+                    description: 'Waterproof adhesive dressings with non-adherent pad for post-operative wounds.',
+                    price: 28,
+                    variants: '6cm x 8.3cm - KSh 28, 15cm x 8cm - KSh 35, 20cm x 10cm - KSh 35, 25cm x 10cm - KSh 35',
+                    image: ''
+                },
+                {
+                    id: 'latex-examination-gloves',
+                    name: 'Latex Examination Gloves',
+                    category: 'gloves',
+                    description: 'Powdered latex gloves for medical examinations. Pack of 100 pieces.',
                     price: 420,
-                    variants: 'Small/Medium/Large (100s) - KSh 420',
+                    variants: 'Medium - KSh 420, Large - KSh 425',
                     image: ''
                 },
                 {
-                    id: 'syringes',
-                    name: 'Syringes',
-                    category: 'injection',
-                    description: 'Disposable syringes with needles for medical procedures.',
+                    id: 'nitrile-gloves',
+                    name: 'Nitrile Gloves (Medium)',
+                    category: 'gloves',
+                    description: 'Powder-free nitrile gloves for sensitive procedures. Pack of 100 pieces.',
+                    price: 550,
+                    variants: 'Medium (100s) - KSh 550',
+                    image: ''
+                },
+                {
+                    id: 'surgical-gloves',
+                    name: 'Surgical Gloves (Powder-Free)',
+                    category: 'gloves',
+                    description: 'Sterile latex surgical gloves, sizes 6.5-8.0. Pack of 12 pairs.',
+                    price: 550,
+                    variants: 'Size 6.5-8.0 (12 pairs) - KSh 550',
+                    image: ''
+                },
+                {
+                    id: 'disposable-syringes',
+                    name: 'Disposable Syringes',
+                    category: 'syringes',
+                    description: 'Sterile disposable syringes without needles. Pack of 100 pieces.',
                     price: 400,
-                    variants: '1ml (100s) - KSh 400, 5ml (100s) - KSh 520, 10ml (100s) - KSh 680',
+                    variants: '2ml - KSh 400, 5ml - KSh 500, 10ml - KSh 700, 20ml - KSh 850',
+                    image: ''
+                },
+                {
+                    id: 'syringes-with-needles',
+                    name: 'Syringes with Needles',
+                    category: 'syringes',
+                    description: 'Complete syringe and needle sets for injections.',
+                    price: 10,
+                    variants: '2ml - KSh 12, 5ml - KSh 10, 10ml - KSh 12, 1ml Insulin - KSh 12',
                     image: ''
                 },
                 {
                     id: 'iv-cannulas',
-                    name: 'IV Cannulas',
-                    category: 'injection',
-                    description: 'Sterile intravenous cannulas for fluid administration.',
+                    name: 'IV Cannulas with Port',
+                    category: 'syringes',
+                    description: 'Sterile intravenous cannulas with injection port for IV access.',
                     price: 14,
-                    variants: '18G/20G/22G/24G - KSh 14 each',
+                    variants: 'G16 - KSh 16, G18 - KSh 14, G20 - KSh 14, G22 - KSh 14, G24 - KSh 21, G26 - KSh 14',
                     image: ''
                 },
                 {
                     id: 'foley-catheters',
                     name: 'Foley Catheters',
                     category: 'catheters',
-                    description: 'Sterile urinary catheters with balloon retention system.',
+                    description: 'Sterile urinary catheters for bladder drainage. 2-way and 3-way options.',
                     price: 60,
-                    variants: '16Fr/18Fr/20Fr - KSh 60 each',
+                    variants: '2-Way (Various sizes) - KSh 60, 3-Way (Various sizes) - KSh 85',
                     image: ''
                 },
                 {
-                    id: 'stethoscopes',
-                    name: 'Stethoscopes',
+                    id: 'feeding-tubes',
+                    name: 'Feeding Tubes',
+                    category: 'catheters',
+                    description: 'Nasogastric feeding tubes for enteral nutrition. Multiple sizes available.',
+                    price: 24,
+                    variants: 'Various sizes - KSh 24',
+                    image: ''
+                },
+                {
+                    id: 'dual-head-stethoscope',
+                    name: 'Dual Head Stethoscope',
                     category: 'diagnostic',
-                    description: 'Professional-grade stethoscopes for cardiac and pulmonary examination.',
+                    description: 'Professional quality stethoscope for cardiac and pulmonary examination.',
                     price: 170,
                     variants: 'Standard - KSh 170',
                     image: ''
                 },
                 {
-                    id: 'bp-monitors',
-                    name: 'BP Monitors',
+                    id: 'blood-pressure-monitors',
+                    name: 'Blood Pressure Monitors',
                     category: 'diagnostic',
-                    description: 'Digital blood pressure monitors with cuff for accurate readings.',
-                    price: 2400,
-                    variants: 'Automatic Digital - KSh 4,800, Manual with Stethoscope - KSh 2,400',
+                    description: 'Digital BP monitors for accurate blood pressure measurement.',
+                    price: 4800,
+                    variants: 'Wrist BP Monitor - KSh 4,800, Omron M1 Basic - KSh 5,000, Omron M2 Basic - KSh 6,500',
                     image: ''
                 },
                 {
-                    id: 'digital-thermometers',
-                    name: 'Digital Thermometers',
+                    id: 'digital-thermometer',
+                    name: 'Digital Thermometer',
                     category: 'diagnostic',
-                    description: 'Fast and accurate digital thermometers for temperature monitoring.',
+                    description: 'Accurate digital thermometer for body temperature measurement.',
                     price: 150,
-                    variants: 'Oral/Underarm - KSh 150',
+                    variants: 'Standard - KSh 150',
                     image: ''
                 },
                 {
-                    id: 'surgical-supplies',
-                    name: 'Surgical Supplies',
+                    id: 'surgical-sutures',
+                    name: 'Surgical Sutures',
                     category: 'surgical',
-                    description: 'Essential surgical instruments and supplies for medical procedures.',
-                    price: 280,
-                    variants: 'Basic Instrument Set - KSh 1,300, Surgical Forceps - KSh 280, Surgical Scissors - KSh 350',
+                    description: 'High-quality sutures for wound closure. Pack of 12 pieces.',
+                    price: 1300,
+                    variants: 'Chromic Catgut - KSh 1,300, Nylon Sutures - KSh 1,300, Vicryl (Polyglactin) - KSh 1,300',
                     image: ''
                 },
                 {
@@ -1403,7 +1688,7 @@
                     category: 'surgical',
                     description: 'Sterile disposable surgical blades. Pack of 100 pieces.',
                     price: 620,
-                    variants: 'Grade 23/24 - KSh 620',
+                    variants: 'Grade 23 - KSh 620, Grade 24 - KSh 620',
                     image: ''
                 },
                 {
@@ -1435,24 +1720,40 @@
                 }
             ];
             
-            // Check if we need to initialize data
+            // Check if we need to initialize or update data
             const storedEquipment = localStorage.getItem('nsg_equipment');
             if (!storedEquipment || JSON.parse(storedEquipment).length === 0) {
                 console.log('Initializing equipment data...');
-                equipmentData = actualEquipment;
+                equipmentData = completeEquipmentData;
                 localStorage.setItem('nsg_equipment', JSON.stringify(equipmentData));
                 console.log('Equipment data initialized with', equipmentData.length, 'items');
+            } else {
+                // Load existing data but merge with any missing items
+                const existing = JSON.parse(storedEquipment);
+                const existingIds = existing.map(item => item.id);
+                const missingItems = completeEquipmentData.filter(item => !existingIds.includes(item.id));
+                
+                if (missingItems.length > 0) {
+                    equipmentData = [...existing, ...missingItems];
+                    localStorage.setItem('nsg_equipment', JSON.stringify(equipmentData));
+                    console.log('Added', missingItems.length, 'missing equipment items');
+                } else {
+                    equipmentData = existing;
+                }
             }
             
-            // Load all data
+            // Load all other data
             loadData();
             
-            // Force update the equipment list
+            // Force update displays
             updateEquipmentList();
             updateCounts();
             
             // Setup image preview handlers
             setupImagePreviewHandlers();
+            
+            // Log the login activity
+            logActivity('session_start');
         });
 
         // Image preview functionality
