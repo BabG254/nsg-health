@@ -142,14 +142,201 @@
             justify-content: center;
             z-index: 9999;
         }
+
+        /* Modal Login System */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-modal-content {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .admin-content {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .admin-content.authenticated {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Anti-bypass protection */
+        .admin-content:not(.authenticated) * {
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Session timeout warning */
+        .session-warning {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10001;
+            max-width: 400px;
+            width: 90%;
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
+    <!-- Modal Login System -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-modal-content">
+            <div class="text-center mb-6">
+                <!-- NSG Health Logo -->
+                <div class="flex justify-center mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <svg width="40" height="35" viewBox="0 0 40 35" class="text-white">
+                                <path d="M20 32C20 32 3 22 3 12C3 7 7 3 12 3C15 3 18 5 20 8C22 5 25 3 28 3C33 3 37 7 37 12C37 22 20 32 20 32Z" fill="currentColor"/>
+                                <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="flex items-baseline space-x-1">
+                                <span class="text-2xl font-bold text-white">NSG</span>
+                                <span class="text-2xl font-bold text-blue-200">HEALTH</span>
+                            </div>
+                            <span class="text-sm text-blue-200 -mt-1" style="font-family: 'Brush Script MT', cursive; font-style: italic;">Admin Access Required</span>
+                        </div>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Admin Authentication</h2>
+                <p class="text-blue-100 text-sm">This is a protected area. Please log in to continue.</p>
+            </div>
+
+            <form id="modalLoginForm" class="space-y-4">
+                <div id="modalErrorMessage" class="hidden bg-red-500 bg-opacity-20 border border-red-300 text-red-100 px-4 py-3 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <span id="modalErrorText">Invalid credentials</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="modalUsername" class="block text-white font-medium mb-2">
+                        <i class="fas fa-user mr-2"></i>Username
+                    </label>
+                    <input type="text" id="modalUsername" name="username" 
+                           class="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" 
+                           placeholder="Enter username" required>
+                </div>
+
+                <div>
+                    <label for="modalPassword" class="block text-white font-medium mb-2">
+                        <i class="fas fa-lock mr-2"></i>Password
+                    </label>
+                    <div class="relative">
+                        <input type="password" id="modalPassword" name="password" 
+                               class="w-full px-4 py-3 bg-white bg-opacity-20 border border-white border-opacity-30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50" 
+                               placeholder="Enter password" required>
+                        <button type="button" id="modalTogglePassword" class="absolute right-3 top-3 text-blue-200 hover:text-white">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center text-blue-100">
+                        <input type="checkbox" id="modalRememberMe" class="mr-2 rounded">
+                        <span class="text-sm">Remember me</span>
+                    </label>
+                    <div class="text-xs text-blue-200">Session timeout: 1 hour</div>
+                </div>
+
+                <button type="submit" class="w-full bg-white text-blue-600 font-semibold py-3 rounded-lg hover:bg-blue-50 transition-colors">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Access Admin Panel
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <a href="index.html" class="text-blue-200 hover:text-white text-sm">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Website
+                </a>
+            </div>
+
+            <!-- Session timeout display -->
+            <div id="sessionTimer" class="mt-4 text-center text-blue-200 text-xs hidden">
+                Session expires in: <span id="timeRemaining">--:--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Warning Modal -->
+    <div id="sessionWarning" class="session-warning">
+        <div class="text-center">
+            <i class="fas fa-clock text-4xl text-yellow-500 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Session Expiring Soon</h3>
+            <p class="text-gray-600 mb-4">Your session will expire in <span id="warningTime">5</span> minutes. Do you want to extend it?</p>
+            <div class="flex space-x-3 justify-center">
+                <button onclick="extendSession()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-refresh mr-2"></i>Extend Session
+                </button>
+                <button onclick="forceLogout()" class="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- All admin content wrapped in authenticated container -->
+    <div id="adminContent" class="admin-content">
     <!-- Authentication Loading Screen -->
-    <div id="authLoading" class="auth-loading">
+    <div id="authLoading" class="auth-loading" style="display: none;">
         <div class="text-center text-white">
             <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-white mb-4 mx-auto"></div>
-            <p class="text-xl">Checking authentication...</p>
+            <p class="text-xl">Verifying session...</p>
         </div>
     </div>
 
@@ -636,32 +823,360 @@
     </div>
 
     <script>
-        // Authentication check
+        // Admin user credentials - in production, this should be server-side
+        const adminUsers = {
+            'admin': { password: '1a2d3m4i5n', role: 'admin', name: 'NSG Health Administrator' },
+            'nsg': { password: 'health2024', role: 'admin', name: 'NSG Health Admin' }
+        };
+
+        // Session management variables
+        let sessionTimer = null;
+        let warningTimer = null;
+        let sessionExpireTime = null;
+        const SESSION_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
+        const WARNING_TIME = 5 * 60 * 1000; // 5 minutes warning
+
+        // Authentication check - now modal-based
         function checkAuthentication() {
-            // Hide loading screen immediately
-            document.getElementById('authLoading').style.display = 'none';
-            
             const session = localStorage.getItem('nsg_admin_session');
+            
             if (!session) {
-                window.location.href = 'login.html';
+                showAuthModal();
                 return false;
             }
             
             const sessionData = JSON.parse(session);
             const loginTime = new Date(sessionData.loginTime);
             const now = new Date();
-            const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+            const timeDiff = now - loginTime;
             
-            // Check if session is expired (8 hours for regular login, unlimited for remember me)
-            if (!sessionData.rememberMe && hoursDiff > 8) {
+            // Check if session is expired (1 hour for regular login, unlimited for remember me)
+            if (!sessionData.rememberMe && timeDiff > SESSION_DURATION) {
                 localStorage.removeItem('nsg_admin_session');
-                window.location.href = 'login.html';
+                showAuthModal();
+                showNotification('Session expired. Please log in again.', 'error');
                 return false;
             }
             
+            // If we get here, authentication is valid
+            hideAuthModal();
+            
             // Update welcome message
             document.getElementById('currentUser').textContent = `Welcome, ${sessionData.name}`;
+            
+            // Start session monitoring if not remember me
+            if (!sessionData.rememberMe) {
+                startSessionMonitoring(sessionData);
+            }
+            
             return true;
+        }
+
+        // Show authentication modal
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('adminContent').classList.remove('authenticated');
+            // Focus on username field
+            setTimeout(() => {
+                document.getElementById('modalUsername').focus();
+            }, 300);
+        }
+
+        // Hide authentication modal
+        function hideAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('adminContent').classList.add('authenticated');
+        }
+
+        // Session monitoring
+        function startSessionMonitoring(sessionData) {
+            const loginTime = new Date(sessionData.loginTime);
+            sessionExpireTime = new Date(loginTime.getTime() + SESSION_DURATION);
+            
+            // Update timer display
+            updateSessionTimer();
+            sessionTimer = setInterval(updateSessionTimer, 1000);
+            
+            // Set warning timer
+            const warningTime = new Date(loginTime.getTime() + SESSION_DURATION - WARNING_TIME);
+            const timeToWarning = warningTime - new Date();
+            
+            if (timeToWarning > 0) {
+                warningTimer = setTimeout(showSessionWarning, timeToWarning);
+            }
+        }
+
+        // Update session timer display
+        function updateSessionTimer() {
+            const now = new Date();
+            const timeLeft = sessionExpireTime - now;
+            
+            if (timeLeft <= 0) {
+                forceLogout();
+                return;
+            }
+            
+            const minutes = Math.floor(timeLeft / 60000);
+            const seconds = Math.floor((timeLeft % 60000) / 1000);
+            
+            const timerElement = document.getElementById('timeRemaining');
+            if (timerElement) {
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById('sessionTimer').classList.remove('hidden');
+            }
+        }
+
+        // Show session warning
+        function showSessionWarning() {
+            document.getElementById('sessionWarning').style.display = 'block';
+            
+            let countdown = 5;
+            const warningInterval = setInterval(() => {
+                document.getElementById('warningTime').textContent = countdown;
+                countdown--;
+                
+                if (countdown < 0) {
+                    clearInterval(warningInterval);
+                    forceLogout();
+                }
+            }, 60000); // Update every minute
+        }
+
+        // Extend session
+        function extendSession() {
+            const session = localStorage.getItem('nsg_admin_session');
+            if (session) {
+                const sessionData = JSON.parse(session);
+                sessionData.loginTime = new Date().toISOString();
+                localStorage.setItem('nsg_admin_session', JSON.stringify(sessionData));
+                
+                // Restart session monitoring
+                clearTimeout(warningTimer);
+                clearInterval(sessionTimer);
+                startSessionMonitoring(sessionData);
+                
+                // Hide warning
+                document.getElementById('sessionWarning').style.display = 'none';
+                
+                showNotification('Session extended successfully', 'info');
+                logActivity('session_extend');
+            }
+        }
+
+        // Force logout
+        function forceLogout() {
+            clearTimeout(warningTimer);
+            clearInterval(sessionTimer);
+            localStorage.removeItem('nsg_admin_session');
+            document.getElementById('sessionWarning').style.display = 'none';
+            showAuthModal();
+            showNotification('Session expired. Please log in again.', 'error');
+            logActivity('session_expired');
+        }
+
+        // Modal login form handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility in modal
+            document.getElementById('modalTogglePassword').addEventListener('click', function() {
+                const passwordInput = document.getElementById('modalPassword');
+                const icon = this.querySelector('i');
+                
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+
+            // Modal login form submission
+            document.getElementById('modalLoginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('modalUsername').value.toLowerCase();
+                const password = document.getElementById('modalPassword').value;
+                const rememberMe = document.getElementById('modalRememberMe').checked;
+                
+                // Show loading state
+                document.getElementById('authLoading').style.display = 'flex';
+                
+                // Simulate authentication delay for security
+                setTimeout(() => {
+                    if (adminUsers[username] && adminUsers[username].password === password) {
+                        // Store session
+                        const sessionData = {
+                            username: username,
+                            role: adminUsers[username].role,
+                            name: adminUsers[username].name,
+                            loginTime: new Date().toISOString(),
+                            rememberMe: rememberMe
+                        };
+                        
+                        localStorage.setItem('nsg_admin_session', JSON.stringify(sessionData));
+                        
+                        // Log the login activity
+                        logActivity('login', {
+                            user: adminUsers[username].name,
+                            role: adminUsers[username].role
+                        });
+                        
+                        // Hide loading and authenticate
+                        document.getElementById('authLoading').style.display = 'none';
+                        checkAuthentication();
+                        
+                        // Clear form
+                        document.getElementById('modalLoginForm').reset();
+                        
+                        showNotification('Login successful! Welcome to NSG Health Admin.', 'success');
+                    } else {
+                        document.getElementById('authLoading').style.display = 'none';
+                        showModalError('Invalid username or password. Please try again.');
+                    }
+                }, 1000);
+            });
+
+            // Show modal error
+            function showModalError(message) {
+                const errorDiv = document.getElementById('modalErrorMessage');
+                const errorText = document.getElementById('modalErrorText');
+                const form = document.getElementById('modalLoginForm');
+                
+                errorText.textContent = message;
+                errorDiv.classList.remove('hidden');
+                form.classList.add('shake');
+                
+                setTimeout(() => {
+                    form.classList.remove('shake');
+                }, 500);
+                
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 5000);
+            }
+
+            // Prevent modal close on escape or outside click
+            document.getElementById('authModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    // Don't close modal - force authentication
+                    showNotification('Authentication required to access admin panel', 'error');
+                }
+            });
+
+            // Prevent escape key from closing modal
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && document.getElementById('authModal').style.display === 'flex') {
+                    e.preventDefault();
+                    showNotification('Authentication required to access admin panel', 'error');
+                }
+            });
+
+            // Additional security: prevent console bypass attempts
+            Object.defineProperty(window, 'hideAuthModal', {
+                value: function() {
+                    if (!checkAuthentication()) {
+                        showNotification('Unauthorized access attempt detected', 'error');
+                        return false;
+                    }
+                    return hideAuthModal();
+                },
+                writable: false,
+                configurable: false
+            });
+
+            // Prevent direct access to admin functions without authentication
+            const originalShowSection = window.showSection;
+            window.showSection = function(...args) {
+                if (!checkAuthentication()) {
+                    showNotification('Please authenticate to access admin functions', 'error');
+                    return false;
+                }
+                return originalShowSection.apply(this, args);
+            };
+
+            // Monitor for authentication bypass attempts
+            setInterval(function() {
+                const authModal = document.getElementById('authModal');
+                const adminContent = document.getElementById('adminContent');
+                
+                if (authModal.style.display !== 'flex' && !adminContent.classList.contains('authenticated')) {
+                    // Potential bypass detected
+                    console.warn('Authentication bypass attempt detected');
+                    showAuthModal();
+                }
+            }, 2000);
+
+            // Initial authentication check
+            checkAuthentication();
+
+            // Also initialize other functionality only if authenticated
+            if (checkAuthentication()) {
+                initializeAdminPanel();
+            }
+        });
+
+        // Initialize admin panel functionality
+        function initializeAdminPanel() {
+            // Initialize mobile menu
+            initializeMobileMenu();
+            
+            // Initialize real-time sync
+            realTimeSync = new RealTimeSync();
+            
+            // Load and initialize data
+            initializeCompleteData();
+            
+            // Setup image preview handlers
+            setupImagePreviewHandlers();
+            
+            // Log the session start activity
+            logActivity('session_start');
+        }
+
+        // Page visibility change handler - pause timers when tab is hidden
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                if (sessionTimer) clearInterval(sessionTimer);
+            } else {
+                // Recheck authentication when tab becomes visible
+                const session = localStorage.getItem('nsg_admin_session');
+                if (session) {
+                    const sessionData = JSON.parse(session);
+                    if (!sessionData.rememberMe) {
+                        const loginTime = new Date(sessionData.loginTime);
+                        const now = new Date();
+                        const timeDiff = now - loginTime;
+                        
+                        if (timeDiff > SESSION_DURATION) {
+                            forceLogout();
+                        } else {
+                            startSessionMonitoring(sessionData);
+                        }
+                    }
+                }
+            }
+        });
+
+        // Update logout function to work with modal
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Log the logout activity
+                logActivity('logout');
+                
+                // Clear timers
+                clearTimeout(warningTimer);
+                clearInterval(sessionTimer);
+                
+                // Clear session data
+                localStorage.removeItem('nsg_admin_session');
+                
+                // Show modal again
+                showAuthModal();
+                
+                showNotification('Logged out successfully', 'info');
+            }
         }
 
         // Real-time communication system
@@ -1515,18 +2030,7 @@
         }
 
         // Initialize on page load with enhanced authentication and mobile support
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check authentication first
-            if (!checkAuthentication()) {
-                return;
-            }
-            
-            // Initialize mobile menu
-            initializeMobileMenu();
-            
-            // Initialize real-time sync
-            realTimeSync = new RealTimeSync();
-            
+        function initializeCompleteData() {
             // Always initialize with complete equipment data from index.html
             const completeEquipmentData = [
                 {
@@ -1748,13 +2252,7 @@
             // Force update displays
             updateEquipmentList();
             updateCounts();
-            
-            // Setup image preview handlers
-            setupImagePreviewHandlers();
-            
-            // Log the login activity
-            logActivity('session_start');
-        });
+        }
 
         // Image preview functionality
         function setupImagePreviewHandlers() {
@@ -1830,5 +2328,6 @@
             });
         }
     </script>
+    </div> <!-- End admin content wrapper -->
 </body>
 </html>
