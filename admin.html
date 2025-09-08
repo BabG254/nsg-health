@@ -1121,17 +1121,7 @@
             });
 
             // Additional security: prevent console bypass attempts
-            Object.defineProperty(window, 'hideAuthModal', {
-                value: function() {
-                    if (!checkAuthentication()) {
-                        showNotification('Unauthorized access attempt detected', 'error');
-                        return false;
-                    }
-                    return hideAuthModal();
-                },
-                writable: false,
-                configurable: false
-            });
+            // Note: hideAuthModal override removed to prevent recursive loops
 
             // Prevent direct access to admin functions without authentication
             const originalShowSection = window.showSection;
