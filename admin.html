@@ -836,6 +836,27 @@
         const SESSION_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
         const WARNING_TIME = 5 * 60 * 1000; // 5 minutes warning
 
+        // Check if all required functions are available
+        function checkFunctionAvailability() {
+            const requiredFunctions = [
+                'showNotification', 'logActivity', 'loadData', 'updateCounts', 
+                'initializeMobileMenu', 'setupImagePreviewHandlers'
+            ];
+            
+            const missingFunctions = [];
+            requiredFunctions.forEach(funcName => {
+                if (typeof window[funcName] !== 'function') {
+                    missingFunctions.push(funcName);
+                }
+            });
+            
+            if (missingFunctions.length > 0) {
+                console.log('Missing functions:', missingFunctions);
+                return false;
+            }
+            return true;
+        }
+
         // Authentication check - now modal-based
         function checkAuthentication() {
             const session = localStorage.getItem('nsg_admin_session');
@@ -1018,14 +1039,40 @@
                         localStorage.setItem('nsg_admin_session', JSON.stringify(sessionData));
                         
                         // Log the login activity
-                        logActivity('login', {
-                            user: adminUsers[username].name,
-                            role: adminUsers[username].role
-                        });
+                        setTimeout(() => {
+                            try {
+                                logActivity('login', {
+                                    user: adminUsers[username].name,
+                                    role: adminUsers[username].role
+                                });
+                            } catch(e) {
+                                console.log('Activity logging not ready yet');
+                            }
+                        }, 100);
                         
                         // Hide loading and authenticate
                         document.getElementById('authLoading').style.display = 'none';
-                        checkAuthentication();
+                        
+                        // Successfully authenticate and show admin content
+                        console.log('Authentication successful, hiding modal and showing admin content');
+                        hideAuthModal();
+                        document.getElementById('currentUser').textContent = `Welcome, ${sessionData.name}`;
+                        
+                        // Initialize admin panel functionality
+                        setTimeout(() => {
+                            console.log('Starting admin panel initialization...');
+                            try {
+                                initializeAdminPanel();
+                                console.log('Admin panel initialization completed successfully');
+                            } catch(e) {
+                                console.log('Admin panel initialization error:', e);
+                                // Try basic initialization
+                                document.getElementById('adminContent').classList.add('authenticated');
+                                loadData();
+                                updateCounts();
+                                console.log('Basic initialization completed as fallback');
+                            }
+                        }, 200);
                         
                         // Clear form
                         document.getElementById('modalLoginForm').reset();
@@ -1109,30 +1156,80 @@
             }, 2000);
 
             // Initial authentication check
-            checkAuthentication();
-
-            // Also initialize other functionality only if authenticated
-            if (checkAuthentication()) {
-                initializeAdminPanel();
-            }
+            setTimeout(() => {
+                const isAuthenticated = checkAuthentication();
+                console.log('Initial authentication check:', isAuthenticated);
+                
+                if (isAuthenticated) {
+                    // User is already authenticated, initialize admin panel
+                    setTimeout(() => {
+                        try {
+                            initializeAdminPanel();
+                        } catch(e) {
+                            console.log('Error in initializeAdminPanel:', e);
+                            basicInitialization();
+                        }
+                    }, 100);
+                }
+            }, 500);
         });
 
         // Initialize admin panel functionality
         function initializeAdminPanel() {
-            // Initialize mobile menu
-            initializeMobileMenu();
-            
-            // Initialize real-time sync
-            realTimeSync = new RealTimeSync();
-            
-            // Load and initialize data
-            initializeCompleteData();
-            
-            // Setup image preview handlers
-            setupImagePreviewHandlers();
-            
-            // Log the session start activity
-            logActivity('session_start');
+            try {
+                // Initialize mobile menu
+                initializeMobileMenu();
+                
+                // Initialize real-time sync
+                realTimeSync = new RealTimeSync();
+                
+                // Load and initialize data
+                initializeCompleteData();
+                
+                // Setup image preview handlers
+                setupImagePreviewHandlers();
+                
+                // Log the session start activity
+                logActivity('session_start');
+            } catch(error) {
+                console.log('Error in full initialization, using basic mode:', error);
+                // Basic fallback initialization
+                basicInitialization();
+            }
+        }
+
+        // Basic fallback initialization
+        function basicInitialization() {
+            try {
+                // Ensure admin content is shown
+                document.getElementById('adminContent').classList.add('authenticated');
+                
+                // Initialize mobile menu if function exists
+                if (typeof initializeMobileMenu === 'function') {
+                    initializeMobileMenu();
+                }
+                
+                // Load data if function exists
+                if (typeof loadData === 'function') {
+                    loadData();
+                }
+                
+                // Update counts if function exists
+                if (typeof updateCounts === 'function') {
+                    updateCounts();
+                }
+                
+                // Setup basic image preview if function exists
+                if (typeof setupImagePreviewHandlers === 'function') {
+                    setupImagePreviewHandlers();
+                }
+                
+                console.log('Basic admin panel initialization completed');
+            } catch(e) {
+                console.log('Even basic initialization failed:', e);
+                // Absolute minimum - just show the admin content
+                document.getElementById('adminContent').classList.add('authenticated');
+            }
         }
 
         // Page visibility change handler - pause timers when tab is hidden
