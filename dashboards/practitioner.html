@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practitioner Dashboard - NSG Health</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="../logo.jpeg">
+    <link rel="shortcut icon" type="image/jpeg" href="../logo.jpeg">
+    <link rel="apple-touch-icon" href="../logo.jpeg">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .urgent-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        .appointment-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .patient-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .emergency-card {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+        
+        .consultation-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-available { background-color: #10b981; }
+        .status-busy { background-color: #f59e0b; }
+        .status-offline { background-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <svg width="32" height="28" viewBox="0 0 40 35" class="text-red-500">
+                                <path d="M20 32C20 32 3 22 3 12C3 7 7 3 12 3C15 3 18 5 20 8C22 5 25 3 28 3C33 3 37 7 37 12C37 22 20 32 20 32Z" fill="currentColor"/>
+                                <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="flex items-baseline space-x-1">
+                                <span class="text-xl font-bold text-blue-600">NSG</span>
+                                <span class="text-xl font-bold text-blue-800">HEALTH</span>
+                            </div>
+                            <span class="text-xs text-blue-600 -mt-1">Practitioner Portal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Status Toggle -->
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-600">Status:</span>
+                        <div class="flex items-center">
+                            <span id="statusIndicator" class="status-indicator status-available"></span>
+                            <select id="statusSelector" class="text-sm border-none bg-transparent focus:outline-none">
+                                <option value="available">Available</option>
+                                <option value="busy">Busy</option>
+                                <option value="offline">Offline</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Emergency Alerts -->
+                    <button id="emergencyAlerts" class="relative p-2 text-gray-400 hover:text-red-600">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                        <span id="emergencyCount" class="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center hidden">0</span>
+                    </button>
+
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 bg-blue-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">2</span>
+                    </button>
+
+                    <!-- User Menu -->
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-3 text-gray-700 hover:text-gray-900">
+                            <div id="userAvatar"></div>
+                            <div class="hidden sm:block text-left">
+                                <div id="userName" class="font-medium"></div>
+                                <div class="text-sm text-gray-500">Practitioner</div>
+                            </div>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+                        
+                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-stethoscope mr-2"></i>Medical Tools
+                            </a>
+                            <a href="../index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-home mr-2"></i>Main Site
+                            </a>
+                            <div class="border-t border-gray-100"></div>
+                            <button onclick="nsgAuth.logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 id="welcomeMessage" class="text-3xl font-bold text-gray-900 mb-2"></h1>
+            <p class="text-gray-600">Manage your appointments, respond to emergencies, and provide quality healthcare</p>
+        </div>
+
+        <!-- Emergency Alerts Section -->
+        <div id="emergencyAlertsSection" class="hidden bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-6 mb-8 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Emergency Alerts</h2>
+                    <p class="opacity-90">Patients need immediate assistance</p>
+                </div>
+                <button id="viewEmergenciesBtn" class="urgent-pulse bg-white text-red-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-ambulance mr-2"></i>View Emergencies
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Manage Appointments -->
+            <div class="appointment-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showAppointments()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Appointments</h3>
+                        <p class="text-sm opacity-90">Manage your schedule</p>
+                        <div class="mt-2">
+                            <span id="todayAppointments" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">today</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-calendar-alt text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Patient Records -->
+            <div class="patient-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showPatientRecords()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Patient Records</h3>
+                        <p class="text-sm opacity-90">View medical histories</p>
+                        <div class="mt-2">
+                            <span id="totalPatients" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">patients</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-user-injured text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Emergency Responses -->
+            <div class="emergency-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showEmergencies()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Emergencies</h3>
+                        <p class="text-sm opacity-90">SOS alerts & responses</p>
+                        <div class="mt-2">
+                            <span id="activeEmergencies" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">active</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-ambulance text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Consultations -->
+            <div class="consultation-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="startConsultation()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Consultations</h3>
+                        <p class="text-sm opacity-90">Virtual & in-person</p>
+                        <div class="mt-2">
+                            <span id="completedToday" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">today</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-video text-3xl opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Today's Schedule & Emergencies -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Today's Appointments -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">Today's Schedule</h3>
+                        <div class="text-sm text-gray-500" id="currentDate"></div>
+                    </div>
+                    <div id="todaySchedule" class="space-y-3">
+                        <!-- Schedule will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Emergency Requests -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900 flex items-center">
+                            <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                            Emergency Requests
+                        </h3>
+                        <button onclick="refreshEmergencies()" class="text-blue-600 hover:text-blue-800 text-sm">
+                            <i class="fas fa-sync-alt mr-1"></i>Refresh
+                        </button>
+                    </div>
+                    <div id="emergencyList" class="space-y-3">
+                        <!-- Emergency requests will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                    <div id="activityList" class="space-y-3">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Statistics & Tools -->
+            <div class="space-y-6">
+                <!-- Practice Statistics -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Practice Statistics</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Appointments Today</span>
+                            <span id="statAppointmentsToday" class="font-semibold text-blue-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">This Week</span>
+                            <span id="statAppointmentsWeek" class="font-semibold text-green-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Emergency Responses</span>
+                            <span id="statEmergencyResponses" class="font-semibold text-red-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Patient Satisfaction</span>
+                            <span id="statSatisfaction" class="font-semibold text-yellow-600">4.8★</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical Tools -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Medical Tools</h3>
+                    <div class="space-y-2">
+                        <button class="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                            <i class="fas fa-prescription text-blue-600 mr-3"></i>
+                            <span class="text-blue-800">Write Prescription</span>
+                        </button>
+                        <button class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                            <i class="fas fa-notes-medical text-green-600 mr-3"></i>
+                            <span class="text-green-800">Medical Notes</span>
+                        </button>
+                        <button class="w-full text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                            <i class="fas fa-x-ray text-purple-600 mr-3"></i>
+                            <span class="text-purple-800">Lab Results</span>
+                        </button>
+                        <button class="w-full text-left p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors">
+                            <i class="fas fa-file-medical-alt text-orange-600 mr-3"></i>
+                            <span class="text-orange-800">Patient History</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Contacts -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Quick Contacts</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-red-800">Emergency Services</div>
+                                <div class="text-sm text-red-600">911 / Ambulance</div>
+                            </div>
+                            <a href="tel:911" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-phone text-xl"></i>
+                            </a>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-blue-800">NSG Health Admin</div>
+                                <div class="text-sm text-blue-600">Support & Coordination</div>
+                            </div>
+                            <a href="tel:+254700894381" class="text-blue-600 hover:text-blue-800">
+                                <i class="fas fa-phone text-xl"></i>
+                            </a>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-green-800">Pharmacy Network</div>
+                                <div class="text-sm text-green-600">Prescription Support</div>
+                            </div>
+                            <a href="https://wa.me/254700894381" class="text-green-600 hover:text-green-800">
+                                <i class="fab fa-whatsapp text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Response Modal -->
+    <div id="emergencyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg w-full max-w-2xl mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-red-600">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>Emergency Response
+                    </h3>
+                    <button onclick="closeEmergencyModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div id="emergencyDetails" class="space-y-4">
+                    <!-- Emergency details will be loaded here -->
+                </div>
+                
+                <div class="flex gap-3 pt-6 border-t">
+                    <button onclick="respondToEmergency('dispatched')" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-ambulance mr-2"></i>Dispatch Response
+                    </button>
+                    <button onclick="respondToEmergency('contacted')" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-phone mr-2"></i>Contact Patient
+                    </button>
+                    <button onclick="closeEmergencyModal()" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../auth.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+        // Practitioner Dashboard specific functionality
+        class PractitionerDashboard {
+            constructor() {
+                this.user = nsgAuth.getCurrentUser();
+                this.appointments = this.loadAppointments();
+                this.emergencies = this.loadEmergencies();
+                this.currentEmergency = null;
+                this.initDashboard();
+            }
+
+            initDashboard() {
+                if (!this.user || this.user.role !== 'practitioner') {
+                    window.location.href = '../signin.html?error=unauthorized';
+                    return;
+                }
+
+                this.setupUserInfo();
+                this.setupEventListeners();
+                this.loadDashboardData();
+                this.setupStatusManagement();
+                this.startEmergencyPolling();
+            }
+
+            setupUserInfo() {
+                document.getElementById('userName').textContent = nsgAuth.getDisplayName(this.user);
+                document.getElementById('userAvatar').innerHTML = nsgAuth.getUserAvatar(this.user);
+                document.getElementById('welcomeMessage').textContent = `Welcome, ${nsgAuth.getDisplayName(this.user)}`;
+
+                // Setup user menu toggle
+                document.getElementById('userMenuBtn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('userMenu').classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', () => {
+                    document.getElementById('userMenu').classList.add('hidden');
+                });
+
+                // Show current date
+                document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            }
+
+            setupEventListeners() {
+                document.getElementById('emergencyAlerts').addEventListener('click', () => {
+                    this.showEmergencyList();
+                });
+
+                document.getElementById('viewEmergenciesBtn').addEventListener('click', () => {
+                    this.showEmergencyList();
+                });
+            }
+
+            setupStatusManagement() {
+                const statusSelector = document.getElementById('statusSelector');
+                const statusIndicator = document.getElementById('statusIndicator');
+
+                // Load saved status
+                const savedStatus = localStorage.getItem('practitioner_status') || 'available';
+                statusSelector.value = savedStatus;
+                this.updateStatusIndicator(savedStatus);
+
+                statusSelector.addEventListener('change', (e) => {
+                    const newStatus = e.target.value;
+                    this.updateStatusIndicator(newStatus);
+                    localStorage.setItem('practitioner_status', newStatus);
+                    
+                    // Log activity
+                    nsgAuth.logActivity('status_changed', { newStatus });
+                });
+            }
+
+            updateStatusIndicator(status) {
+                const indicator = document.getElementById('statusIndicator');
+                indicator.className = `status-indicator status-${status}`;
+            }
+
+            loadDashboardData() {
+                this.updateStatistics();
+                this.loadTodaySchedule();
+                this.loadEmergencyRequests();
+                this.loadRecentActivity();
+            }
+
+            updateStatistics() {
+                const today = new Date().toDateString();
+                const todayAppointments = this.appointments.filter(apt => 
+                    new Date(apt.date).toDateString() === today && apt.status !== 'cancelled'
+                );
+
+                const thisWeek = this.getThisWeekAppointments();
+                const activeEmergencies = this.emergencies.filter(em => em.status === 'active');
+
+                // Update dashboard stats
+                document.getElementById('todayAppointments').textContent = todayAppointments.length;
+                document.getElementById('totalPatients').textContent = this.getUniquePatients().length;
+                document.getElementById('activeEmergencies').textContent = activeEmergencies.length;
+                document.getElementById('completedToday').textContent = todayAppointments.filter(apt => apt.status === 'completed').length;
+
+                // Update detailed stats
+                document.getElementById('statAppointmentsToday').textContent = todayAppointments.length;
+                document.getElementById('statAppointmentsWeek').textContent = thisWeek.length;
+                document.getElementById('statEmergencyResponses').textContent = this.emergencies.filter(em => em.responderId === this.user.id).length;
+
+                // Update emergency alert count
+                if (activeEmergencies.length > 0) {
+                    document.getElementById('emergencyCount').textContent = activeEmergencies.length;
+                    document.getElementById('emergencyCount').classList.remove('hidden');
+                    document.getElementById('emergencyAlertsSection').classList.remove('hidden');
+                } else {
+                    document.getElementById('emergencyCount').classList.add('hidden');
+                    document.getElementById('emergencyAlertsSection').classList.add('hidden');
+                }
+            }
+
+            loadTodaySchedule() {
+                const today = new Date().toDateString();
+                const todayAppointments = this.appointments.filter(apt => 
+                    new Date(apt.date).toDateString() === today
+                ).sort((a, b) => a.time.localeCompare(b.time));
+
+                const scheduleContainer = document.getElementById('todaySchedule');
+
+                if (todayAppointments.length === 0) {
+                    scheduleContainer.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-calendar-check text-4xl mb-3"></i>
+                            <p>No appointments scheduled for today</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                scheduleContainer.innerHTML = todayAppointments.map(apt => `
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-user text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">${apt.patientName}</div>
+                                <div class="text-sm text-gray-600">${apt.service}</div>
+                                <div class="text-xs text-gray-500">
+                                    <i class="fas fa-clock mr-1"></i>${apt.time} • 
+                                    <i class="fas fa-map-marker-alt mr-1"></i>${apt.location}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block px-3 py-1 bg-${this.getStatusColor(apt.status)}-100 text-${this.getStatusColor(apt.status)}-800 rounded-full text-xs font-medium">
+                                ${apt.status}
+                            </span>
+                            <div class="mt-1">
+                                <button onclick="markAppointmentComplete('${apt.id}')" class="text-xs text-blue-600 hover:text-blue-800">
+                                    Complete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            loadEmergencyRequests() {
+                const activeEmergencies = this.emergencies.filter(em => em.status === 'active')
+                    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                const emergencyContainer = document.getElementById('emergencyList');
+
+                if (activeEmergencies.length === 0) {
+                    emergencyContainer.innerHTML = `
+                        <div class="text-center py-6 text-gray-500">
+                            <i class="fas fa-shield-alt text-3xl mb-2"></i>
+                            <p>No active emergencies</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                emergencyContainer.innerHTML = activeEmergencies.map(emergency => `
+                    <div class="flex items-center justify-between p-4 border-l-4 border-red-500 bg-red-50 rounded-lg cursor-pointer hover:bg-red-100"
+                         onclick="viewEmergencyDetails('${emergency.id}')">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-exclamation-triangle text-red-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-red-900">${emergency.type.toUpperCase()}</div>
+                                <div class="text-sm text-red-700">${emergency.patientName || 'Unknown Patient'}</div>
+                                <div class="text-xs text-red-600">
+                                    <i class="fas fa-clock mr-1"></i>${this.getTimeAgo(emergency.timestamp)}
+                                    ${emergency.location ? `• <i class="fas fa-map-marker-alt mr-1"></i>${emergency.location.address || 'Location available'}` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                                Respond
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            loadRecentActivity() {
+                const activities = nsgAuth.getUserActivities(this.user.id, 5);
+                const activityList = document.getElementById('activityList');
+
+                if (activities.length === 0) {
+                    activityList.innerHTML = `
+                        <div class="text-center py-4 text-gray-500">
+                            <i class="fas fa-history text-2xl mb-2"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                activityList.innerHTML = activities.map(activity => `
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-${this.getActivityIcon(activity.action)} text-blue-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">${this.getActivityDescription(activity)}</div>
+                            <div class="text-xs text-gray-500">${this.formatDate(activity.timestamp)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            startEmergencyPolling() {
+                // Poll for new emergencies every 30 seconds
+                setInterval(() => {
+                    this.loadEmergencies();
+                    this.updateStatistics();
+                    this.loadEmergencyRequests();
+                }, 30000);
+            }
+
+            showEmergencyList() {
+                // This would open a dedicated emergency management view
+                showToast('Opening emergency management...', 'info');
+            }
+
+            viewEmergencyDetails(emergencyId) {
+                const emergency = this.emergencies.find(em => em.id === emergencyId);
+                if (!emergency) return;
+
+                this.currentEmergency = emergency;
+                
+                document.getElementById('emergencyDetails').innerHTML = `
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                        <div class="flex items-center mb-3">
+                            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-semibold text-red-900">${emergency.type.toUpperCase()} EMERGENCY</h4>
+                                <p class="text-sm text-red-700">Reported ${this.getTimeAgo(emergency.timestamp)}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <h5 class="font-semibold text-gray-900 mb-2">Patient Information</h5>
+                            <div class="space-y-1 text-sm">
+                                <p><strong>Name:</strong> ${emergency.patientName || 'Unknown'}</p>
+                                <p><strong>Phone:</strong> ${emergency.patientPhone || 'Not provided'}</p>
+                                <p><strong>Emergency Type:</strong> ${emergency.type}</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h5 class="font-semibold text-gray-900 mb-2">Location & Details</h5>
+                            <div class="space-y-1 text-sm">
+                                ${emergency.location ? `
+                                    <p><strong>Address:</strong> ${emergency.location.address || 'Available'}</p>
+                                    <p><strong>Coordinates:</strong> ${emergency.location.coords?.latitude.toFixed(4)}, ${emergency.location.coords?.longitude.toFixed(4)}</p>
+                                ` : '<p><strong>Location:</strong> Not available</p>'}
+                                <p><strong>Urgency:</strong> <span class="text-red-600 font-medium">HIGH</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${emergency.description ? `
+                        <div class="mb-4">
+                            <h5 class="font-semibold text-gray-900 mb-2">Description</h5>
+                            <div class="bg-gray-50 rounded-lg p-3 text-sm">
+                                ${emergency.description}
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+
+                document.getElementById('emergencyModal').classList.remove('hidden');
+            }
+
+            // Utility methods
+            loadAppointments() {
+                return JSON.parse(localStorage.getItem('nsg_appointments') || '[]');
+            }
+
+            loadEmergencies() {
+                this.emergencies = JSON.parse(localStorage.getItem('nsg_emergencies') || '[]');
+                return this.emergencies;
+            }
+
+            getThisWeekAppointments() {
+                const today = new Date();
+                const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
+                const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6));
+
+                return this.appointments.filter(apt => {
+                    const aptDate = new Date(apt.date);
+                    return aptDate >= weekStart && aptDate <= weekEnd;
+                });
+            }
+
+            getUniquePatients() {
+                const patients = new Set();
+                this.appointments.forEach(apt => patients.add(apt.patientId));
+                return Array.from(patients);
+            }
+
+            getStatusColor(status) {
+                const colors = {
+                    'scheduled': 'blue',
+                    'completed': 'green',
+                    'cancelled': 'red',
+                    'in-progress': 'yellow'
+                };
+                return colors[status] || 'gray';
+            }
+
+            getTimeAgo(timestamp) {
+                const now = new Date();
+                const time = new Date(timestamp);
+                const diffInMinutes = Math.floor((now - time) / (1000 * 60));
+
+                if (diffInMinutes < 1) return 'just now';
+                if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+                
+                const diffInHours = Math.floor(diffInMinutes / 60);
+                if (diffInHours < 24) return `${diffInHours}h ago`;
+                
+                const diffInDays = Math.floor(diffInHours / 24);
+                return `${diffInDays}d ago`;
+            }
+
+            getActivityIcon(action) {
+                const icons = {
+                    'login': 'sign-in-alt',
+                    'status_changed': 'toggle-on',
+                    'emergency_responded': 'ambulance',
+                    'appointment_completed': 'check-circle',
+                    'prescription_written': 'prescription'
+                };
+                return icons[action] || 'activity';
+            }
+
+            getActivityDescription(activity) {
+                const descriptions = {
+                    'login': 'Signed in to practitioner portal',
+                    'status_changed': `Changed status to ${activity.details.newStatus}`,
+                    'emergency_responded': 'Responded to emergency request',
+                    'appointment_completed': 'Completed patient appointment',
+                    'prescription_written': 'Wrote prescription for patient'
+                };
+                return descriptions[activity.action] || 'Unknown activity';
+            }
+
+            formatDate(dateString) {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        }
+
+        // Global functions
+        function showAppointments() {
+            showToast('Opening appointments manager...', 'info');
+        }
+
+        function showPatientRecords() {
+            showToast('Opening patient records...', 'info');
+        }
+
+        function showEmergencies() {
+            practitionerDashboard.showEmergencyList();
+        }
+
+        function startConsultation() {
+            showToast('Starting virtual consultation...', 'info');
+        }
+
+        function refreshEmergencies() {
+            practitionerDashboard.loadEmergencies();
+            practitionerDashboard.updateStatistics();
+            practitionerDashboard.loadEmergencyRequests();
+            showToast('Emergencies refreshed', 'success');
+        }
+
+        function markAppointmentComplete(appointmentId) {
+            showToast('Marking appointment as complete...', 'success');
+            // Implementation would update appointment status
+        }
+
+        function viewEmergencyDetails(emergencyId) {
+            practitionerDashboard.viewEmergencyDetails(emergencyId);
+        }
+
+        function closeEmergencyModal() {
+            document.getElementById('emergencyModal').classList.add('hidden');
+        }
+
+        function respondToEmergency(responseType) {
+            if (!practitionerDashboard.currentEmergency) return;
+
+            const emergency = practitionerDashboard.currentEmergency;
+            
+            // Update emergency status
+            emergency.status = 'responded';
+            emergency.responderId = practitionerDashboard.user.id;
+            emergency.responderName = nsgAuth.getDisplayName(practitionerDashboard.user);
+            emergency.responseType = responseType;
+            emergency.responseTime = new Date().toISOString();
+
+            // Save updated emergency
+            const emergencies = JSON.parse(localStorage.getItem('nsg_emergencies') || '[]');
+            const index = emergencies.findIndex(em => em.id === emergency.id);
+            if (index > -1) {
+                emergencies[index] = emergency;
+                localStorage.setItem('nsg_emergencies', JSON.stringify(emergencies));
+            }
+
+            // Log activity
+            nsgAuth.logActivity('emergency_responded', {
+                emergencyId: emergency.id,
+                responseType: responseType,
+                patientName: emergency.patientName
+            });
+
+            showToast(`Emergency response ${responseType} successfully!`, 'success');
+            closeEmergencyModal();
+            
+            // Refresh dashboard
+            practitionerDashboard.loadDashboardData();
+        }
+
+        // Initialize dashboard
+        let practitionerDashboard;
+        document.addEventListener('DOMContentLoaded', () => {
+            practitionerDashboard = new PractitionerDashboard();
+        });
+    </script>
+</body>
+</html>

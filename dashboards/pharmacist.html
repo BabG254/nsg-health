@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacist Dashboard - NSG Health</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="../logo.jpeg">
+    <link rel="shortcut icon" type="image/jpeg" href="../logo.jpeg">
+    <link rel="apple-touch-icon" href="../logo.jpeg">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .prescriptions-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .inventory-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .consultations-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .revenue-card {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <svg width="32" height="28" viewBox="0 0 40 35" class="text-red-500">
+                                <path d="M20 32C20 32 3 22 3 12C3 7 7 3 12 3C15 3 18 5 20 8C22 5 25 3 28 3C33 3 37 7 37 12C37 22 20 32 20 32Z" fill="currentColor"/>
+                                <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="flex items-baseline space-x-1">
+                                <span class="text-xl font-bold text-blue-600">NSG</span>
+                                <span class="text-xl font-bold text-blue-800">HEALTH</span>
+                            </div>
+                            <span class="text-xs text-blue-600 -mt-1">Pharmacy Portal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Emergency Alert -->
+                    <button id="emergencyAlert" class="relative p-2 text-red-600 hover:text-red-800 hidden">
+                        <i class="fas fa-ambulance text-xl animate-pulse"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">!</span>
+                    </button>
+
+                    <!-- Quick Actions -->
+                    <button onclick="quickPrescription()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-prescription mr-2"></i>Dispense
+                    </button>
+
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 bg-blue-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+
+                    <!-- User Menu -->
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-3 text-gray-700 hover:text-gray-900">
+                            <div id="userAvatar"></div>
+                            <div class="hidden sm:block text-left">
+                                <div id="userName" class="font-medium"></div>
+                                <div class="text-sm text-gray-500">Pharmacist</div>
+                            </div>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+                        
+                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-certificate mr-2"></i>License Info
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-building mr-2"></i>Pharmacy
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <a href="../index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-home mr-2"></i>Main Site
+                            </a>
+                            <div class="border-t border-gray-100"></div>
+                            <button onclick="nsgAuth.logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 id="welcomeMessage" class="text-3xl font-bold text-gray-900 mb-2"></h1>
+            <p class="text-gray-600">Manage prescriptions, dispense medications, and provide pharmaceutical care</p>
+            
+            <!-- Quick Status Bar -->
+            <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                    <div class="text-2xl font-bold text-blue-600" id="pendingPrescriptions">0</div>
+                    <div class="text-sm text-gray-600">Pending Prescriptions</div>
+                </div>
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                    <div class="text-2xl font-bold text-green-600" id="todayDispensed">0</div>
+                    <div class="text-sm text-gray-600">Dispensed Today</div>
+                </div>
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                    <div class="text-2xl font-bold text-yellow-600" id="lowStock">0</div>
+                    <div class="text-sm text-gray-600">Low Stock Items</div>
+                </div>
+                <div class="bg-white rounded-lg p-3 shadow-sm">
+                    <div class="text-2xl font-bold text-purple-600" id="consultationsToday">0</div>
+                    <div class="text-sm text-gray-600">Consultations Today</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Prescriptions -->
+            <div class="prescriptions-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showPrescriptions()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Prescriptions</h3>
+                        <p class="text-sm opacity-90">Process & dispense</p>
+                        <div class="mt-2">
+                            <span id="totalPrescriptions" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">pending</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-prescription-bottle-alt text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Inventory -->
+            <div class="inventory-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showInventory()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Inventory</h3>
+                        <p class="text-sm opacity-90">Stock management</p>
+                        <div class="mt-2">
+                            <span id="totalMedications" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">items</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-pills text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Consultations -->
+            <div class="consultations-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showConsultations()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Consultations</h3>
+                        <p class="text-sm opacity-90">Patient counseling</p>
+                        <div class="mt-2">
+                            <span id="consultationsCount" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">scheduled</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-user-md text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Revenue -->
+            <div class="revenue-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showRevenue()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Revenue</h3>
+                        <p class="text-sm opacity-90">Daily earnings</p>
+                        <div class="mt-2">
+                            <span id="dailyRevenue" class="text-2xl font-bold">KSh 0</span>
+                            <span class="text-sm opacity-75">today</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chart-line text-3xl opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Prescriptions & Orders -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Pending Prescriptions -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">Pending Prescriptions</h3>
+                        <button onclick="showPrescriptions()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View All
+                        </button>
+                    </div>
+                    <div id="prescriptionsList" class="space-y-3">
+                        <!-- Prescriptions will be loaded here -->
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-prescription-bottle-alt text-4xl mb-3"></i>
+                            <p>No pending prescriptions</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Consultations -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">Recent Consultations</h3>
+                        <button onclick="showConsultations()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View All
+                        </button>
+                    </div>
+                    <div id="consultationsList" class="space-y-3">
+                        <!-- Consultations will be loaded here -->
+                        <div class="text-center py-6 text-gray-500">
+                            <i class="fas fa-comments text-3xl mb-2"></i>
+                            <p>No consultations scheduled</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                    <div id="activityList" class="space-y-3">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Tools & Statistics -->
+            <div class="space-y-6">
+                <!-- Quick Tools -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Quick Tools</h3>
+                    <div class="space-y-2">
+                        <button onclick="quickPrescription()" class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                            <i class="fas fa-prescription text-green-600 mr-3"></i>
+                            <span class="text-green-800">Quick Dispense</span>
+                        </button>
+                        <button onclick="drugInteractionCheck()" class="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                            <i class="fas fa-search text-blue-600 mr-3"></i>
+                            <span class="text-blue-800">Drug Interaction Check</span>
+                        </button>
+                        <button onclick="inventoryAlert()" class="w-full text-left p-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors">
+                            <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                            <span class="text-yellow-800">Low Stock Alerts</span>
+                        </button>
+                        <button onclick="patientHistory()" class="w-full text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                            <i class="fas fa-history text-purple-600 mr-3"></i>
+                            <span class="text-purple-800">Patient History</span>
+                        </button>
+                        <button onclick="emergencyProtocol()" class="w-full text-left p-3 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                            <i class="fas fa-first-aid text-red-600 mr-3"></i>
+                            <span class="text-red-800">Emergency Protocol</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Pharmacy Statistics -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Pharmacy Statistics</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Prescriptions Filled</span>
+                            <span id="statPrescriptionsFilled" class="font-semibold text-blue-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Consultations Given</span>
+                            <span id="statConsultationsGiven" class="font-semibold text-green-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Inventory Items</span>
+                            <span id="statInventoryItems" class="font-semibold text-purple-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Monthly Revenue</span>
+                            <span id="statMonthlyRevenue" class="font-semibold text-orange-600">KSh 0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medication Alerts -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Medication Alerts</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+                            <div class="font-medium text-red-800">Expiry Alert</div>
+                            <div class="text-sm text-red-600">3 medications expiring soon</div>
+                        </div>
+                        <div class="p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+                            <div class="font-medium text-yellow-800">Low Stock</div>
+                            <div class="text-sm text-yellow-600">5 items need restocking</div>
+                        </div>
+                        <div class="p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                            <div class="font-medium text-blue-800">New Arrivals</div>
+                            <div class="text-sm text-blue-600">8 new items received</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Contacts -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Emergency Contacts</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                            <div>
+                                <div class="font-medium text-gray-900">Poison Control</div>
+                                <div class="text-sm text-gray-600">24/7 Emergency Line</div>
+                            </div>
+                            <button onclick="callEmergency('poison')" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                            <div>
+                                <div class="font-medium text-gray-900">Hospital ER</div>
+                                <div class="text-sm text-gray-600">Kenyatta Hospital</div>
+                            </div>
+                            <button onclick="callEmergency('hospital')" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                            <div>
+                                <div class="font-medium text-gray-900">Pharmacy Board</div>
+                                <div class="text-sm text-gray-600">Regulatory Support</div>
+                            </div>
+                            <button onclick="callEmergency('board')" class="text-green-600 hover:text-green-800">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Dispense Modal -->
+    <div id="quickDispenseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg w-full max-w-2xl mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold">Quick Prescription Dispense</h3>
+                    <button onclick="closeQuickDispenseModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="quickDispenseForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Patient Name</label>
+                            <input type="text" name="patientName" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                   placeholder="Enter patient name">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Patient ID/Phone</label>
+                            <input type="text" name="patientId" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                   placeholder="ID or phone number">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Medication</label>
+                        <select name="medication" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select medication</option>
+                            <option value="paracetamol">Paracetamol 500mg</option>
+                            <option value="amoxicillin">Amoxicillin 250mg</option>
+                            <option value="ibuprofen">Ibuprofen 400mg</option>
+                            <option value="aspirin">Aspirin 100mg</option>
+                            <option value="omeprazole">Omeprazole 20mg</option>
+                            <option value="metformin">Metformin 500mg</option>
+                            <option value="amlodipine">Amlodipine 5mg</option>
+                            <option value="cough_syrup">Cough Syrup</option>
+                            <option value="vitamin_c">Vitamin C tablets</option>
+                            <option value="bandages">Bandages</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Quantity</label>
+                            <input type="number" name="quantity" required min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                   placeholder="1">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Unit Price (KSh)</label>
+                            <input type="number" name="unitPrice" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                   placeholder="0.00">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Total (KSh)</label>
+                            <input type="number" name="totalPrice" readonly class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100" 
+                                   placeholder="0.00">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Dosage Instructions</label>
+                        <textarea name="dosageInstructions" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                  placeholder="e.g., Take 1 tablet twice daily after meals"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Prescribing Doctor</label>
+                        <input type="text" name="doctor" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                               placeholder="Doctor's name (optional)">
+                    </div>
+                    
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeQuickDispenseModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            Dispense Medication
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../auth.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+        // Pharmacist Dashboard specific functionality
+        class PharmacistDashboard {
+            constructor() {
+                this.user = nsgAuth.getCurrentUser();
+                this.prescriptions = this.loadPrescriptions();
+                this.inventory = this.loadInventory();
+                this.consultations = this.loadConsultations();
+                this.dispensedMedications = this.loadDispensedMedications();
+                this.initDashboard();
+            }
+
+            initDashboard() {
+                if (!this.user || this.user.role !== 'pharmacist') {
+                    window.location.href = '../signin.html?error=unauthorized';
+                    return;
+                }
+
+                this.setupUserInfo();
+                this.setupEventListeners();
+                this.loadDashboardData();
+                this.setupQuickDispenseForm();
+                this.setupEmergencyAlerts();
+                this.startActivityPolling();
+            }
+
+            setupUserInfo() {
+                document.getElementById('userName').textContent = nsgAuth.getDisplayName(this.user);
+                document.getElementById('userAvatar').innerHTML = nsgAuth.getUserAvatar(this.user);
+                document.getElementById('welcomeMessage').textContent = `Welcome, Dr. ${this.user.firstName}!`;
+
+                // Setup user menu toggle
+                document.getElementById('userMenuBtn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('userMenu').classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', () => {
+                    document.getElementById('userMenu').classList.add('hidden');
+                });
+            }
+
+            setupEventListeners() {
+                // Quantity and price calculation
+                document.addEventListener('input', (e) => {
+                    if (e.target.name === 'quantity' || e.target.name === 'unitPrice') {
+                        this.calculateTotal();
+                    }
+                });
+            }
+
+            loadDashboardData() {
+                this.updateQuickStats();
+                this.updateStatistics();
+                this.displayPrescriptions();
+                this.displayConsultations();
+                this.loadRecentActivity();
+            }
+
+            updateQuickStats() {
+                const pendingPrescriptions = this.prescriptions.filter(p => p.status === 'pending').length;
+                const todayDispensed = this.dispensedMedications.filter(d => this.isToday(d.dispensedAt)).length;
+                const lowStock = this.inventory.filter(i => i.stock < i.minStock).length;
+                const consultationsToday = this.consultations.filter(c => this.isToday(c.scheduledAt)).length;
+
+                document.getElementById('pendingPrescriptions').textContent = pendingPrescriptions;
+                document.getElementById('todayDispensed').textContent = todayDispensed;
+                document.getElementById('lowStock').textContent = lowStock;
+                document.getElementById('consultationsToday').textContent = consultationsToday;
+            }
+
+            updateStatistics() {
+                const pendingPrescriptions = this.prescriptions.filter(p => p.status === 'pending').length;
+                const totalMedications = this.inventory.length;
+                const consultationsCount = this.consultations.filter(c => c.status === 'scheduled').length;
+                
+                const dailyRevenue = this.dispensedMedications
+                    .filter(d => this.isToday(d.dispensedAt))
+                    .reduce((sum, med) => sum + (med.totalPrice || 0), 0);
+
+                const monthlyRevenue = this.dispensedMedications
+                    .filter(d => this.isThisMonth(d.dispensedAt))
+                    .reduce((sum, med) => sum + (med.totalPrice || 0), 0);
+
+                // Update cards
+                document.getElementById('totalPrescriptions').textContent = pendingPrescriptions;
+                document.getElementById('totalMedications').textContent = totalMedications;
+                document.getElementById('consultationsCount').textContent = consultationsCount;
+                document.getElementById('dailyRevenue').textContent = this.formatCurrency(dailyRevenue);
+
+                // Update detailed stats
+                document.getElementById('statPrescriptionsFilled').textContent = this.dispensedMedications.length;
+                document.getElementById('statConsultationsGiven').textContent = this.consultations.filter(c => c.status === 'completed').length;
+                document.getElementById('statInventoryItems').textContent = totalMedications;
+                document.getElementById('statMonthlyRevenue').textContent = this.formatCurrency(monthlyRevenue);
+            }
+
+            displayPrescriptions() {
+                const prescriptionsList = document.getElementById('prescriptionsList');
+                const pendingPrescriptions = this.prescriptions.filter(p => p.status === 'pending').slice(0, 5);
+
+                if (pendingPrescriptions.length === 0) {
+                    prescriptionsList.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-prescription-bottle-alt text-4xl mb-3"></i>
+                            <p>No pending prescriptions</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                prescriptionsList.innerHTML = pendingPrescriptions.map(prescription => `
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                <i class="fas fa-prescription text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">${prescription.patientName}</div>
+                                <div class="text-sm text-gray-600">${prescription.medication} - ${prescription.dosage}</div>
+                                <div class="text-xs text-gray-500">Dr. ${prescription.prescribedBy} • ${this.formatDate(prescription.createdAt)}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button onclick="dispensePrescription('${prescription.id}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                Dispense
+                            </button>
+                            <div class="text-xs text-gray-500 mt-1">
+                                ${prescription.urgent ? '<span class="text-red-600">URGENT</span>' : 'Regular'}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            displayConsultations() {
+                const consultationsList = document.getElementById('consultationsList');
+                const upcomingConsultations = this.consultations.filter(c => c.status === 'scheduled').slice(0, 3);
+
+                if (upcomingConsultations.length === 0) {
+                    consultationsList.innerHTML = `
+                        <div class="text-center py-6 text-gray-500">
+                            <i class="fas fa-comments text-3xl mb-2"></i>
+                            <p>No consultations scheduled</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                consultationsList.innerHTML = upcomingConsultations.map(consultation => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-green-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">${consultation.patientName}</div>
+                                <div class="text-sm text-gray-600">${consultation.consultationType}</div>
+                                <div class="text-xs text-gray-500">${this.formatDateTime(consultation.scheduledAt)}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button onclick="startConsultation('${consultation.id}')" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+                                Start
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            loadRecentActivity() {
+                const activities = nsgAuth.getUserActivities(this.user.id, 5);
+                const activityList = document.getElementById('activityList');
+
+                if (activities.length === 0) {
+                    activityList.innerHTML = `
+                        <div class="text-center py-4 text-gray-500">
+                            <i class="fas fa-history text-2xl mb-2"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                activityList.innerHTML = activities.map(activity => `
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-${this.getActivityIcon(activity.action)} text-blue-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">${this.getActivityDescription(activity)}</div>
+                            <div class="text-xs text-gray-500">${this.formatDate(activity.timestamp)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            setupQuickDispenseForm() {
+                document.getElementById('quickDispenseForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.dispenseMedication(e.target);
+                });
+            }
+
+            setupEmergencyAlerts() {
+                // Check for emergency requests
+                this.checkEmergencyRequests();
+            }
+
+            startActivityPolling() {
+                // Poll for new prescriptions and emergency requests
+                setInterval(() => {
+                    this.checkEmergencyRequests();
+                    this.checkNewPrescriptions();
+                }, 30000); // Check every 30 seconds
+            }
+
+            dispenseMedication(form) {
+                const formData = new FormData(form);
+                const medicationData = {
+                    id: 'disp_' + Date.now(),
+                    pharmacistId: this.user.id,
+                    pharmacistName: nsgAuth.getDisplayName(this.user),
+                    patientName: formData.get('patientName'),
+                    patientId: formData.get('patientId'),
+                    medication: formData.get('medication'),
+                    quantity: parseInt(formData.get('quantity')),
+                    unitPrice: parseFloat(formData.get('unitPrice')),
+                    totalPrice: parseFloat(formData.get('totalPrice')),
+                    dosageInstructions: formData.get('dosageInstructions'),
+                    prescribingDoctor: formData.get('doctor'),
+                    dispensedAt: new Date().toISOString(),
+                    status: 'dispensed'
+                };
+
+                // Add to dispensed medications
+                this.dispensedMedications.unshift(medicationData);
+                this.saveDispensedMedications();
+
+                // Update inventory
+                this.updateInventoryStock(medicationData.medication, medicationData.quantity);
+
+                // Log activity
+                nsgAuth.logActivity('medication_dispensed', {
+                    patientName: medicationData.patientName,
+                    medication: medicationData.medication,
+                    quantity: medicationData.quantity,
+                    totalPrice: medicationData.totalPrice
+                });
+
+                showToast(`Medication dispensed to ${medicationData.patientName}`, 'success');
+                this.closeQuickDispenseModal();
+                form.reset();
+
+                // Refresh dashboard
+                this.loadDashboardData();
+            }
+
+            calculateTotal() {
+                const quantity = document.querySelector('input[name="quantity"]').value || 0;
+                const unitPrice = document.querySelector('input[name="unitPrice"]').value || 0;
+                const total = parseFloat(quantity) * parseFloat(unitPrice);
+                
+                document.querySelector('input[name="totalPrice"]').value = total.toFixed(2);
+            }
+
+            checkEmergencyRequests() {
+                const emergencyRequests = JSON.parse(localStorage.getItem('nsg_emergency_requests') || '[]');
+                const activeEmergencies = emergencyRequests.filter(req => req.status === 'active');
+                
+                const emergencyAlert = document.getElementById('emergencyAlert');
+                if (activeEmergencies.length > 0) {
+                    emergencyAlert.classList.remove('hidden');
+                } else {
+                    emergencyAlert.classList.add('hidden');
+                }
+            }
+
+            checkNewPrescriptions() {
+                // Check for new prescriptions that need attention
+                const urgentPrescriptions = this.prescriptions.filter(p => 
+                    p.status === 'pending' && p.urgent
+                );
+                
+                if (urgentPrescriptions.length > 0) {
+                    // Could show notification here
+                }
+            }
+
+            updateInventoryStock(medicationName, quantityDispensed) {
+                const medication = this.inventory.find(item => 
+                    item.name.toLowerCase().includes(medicationName.toLowerCase())
+                );
+                
+                if (medication) {
+                    medication.stock -= quantityDispensed;
+                    this.saveInventory();
+                }
+            }
+
+            closeQuickDispenseModal() {
+                document.getElementById('quickDispenseModal').classList.add('hidden');
+            }
+
+            // Utility methods
+            loadPrescriptions() {
+                return JSON.parse(localStorage.getItem('nsg_prescriptions') || '[]');
+            }
+
+            loadInventory() {
+                return JSON.parse(localStorage.getItem('nsg_pharmacy_inventory') || '[]');
+            }
+
+            loadConsultations() {
+                return JSON.parse(localStorage.getItem('nsg_pharmacy_consultations') || '[]');
+            }
+
+            loadDispensedMedications() {
+                const allDispensed = JSON.parse(localStorage.getItem('nsg_dispensed_medications') || '[]');
+                return allDispensed.filter(d => d.pharmacistId === this.user.id);
+            }
+
+            saveDispensedMedications() {
+                const allDispensed = JSON.parse(localStorage.getItem('nsg_dispensed_medications') || '[]');
+                const otherDispensed = allDispensed.filter(d => d.pharmacistId !== this.user.id);
+                const updatedDispensed = [...otherDispensed, ...this.dispensedMedications];
+                localStorage.setItem('nsg_dispensed_medications', JSON.stringify(updatedDispensed));
+            }
+
+            saveInventory() {
+                localStorage.setItem('nsg_pharmacy_inventory', JSON.stringify(this.inventory));
+            }
+
+            isToday(dateString) {
+                const date = new Date(dateString);
+                const today = new Date();
+                return date.toDateString() === today.toDateString();
+            }
+
+            isThisMonth(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+            }
+
+            getActivityIcon(action) {
+                const icons = {
+                    'login': 'sign-in-alt',
+                    'medication_dispensed': 'pills',
+                    'consultation_completed': 'user-md',
+                    'inventory_updated': 'boxes',
+                    'prescription_filled': 'prescription-bottle-alt'
+                };
+                return icons[action] || 'activity';
+            }
+
+            getActivityDescription(activity) {
+                const descriptions = {
+                    'login': 'Signed in to pharmacy portal',
+                    'medication_dispensed': `Dispensed ${activity.details.medication} to ${activity.details.patientName}`,
+                    'consultation_completed': 'Completed patient consultation',
+                    'inventory_updated': 'Updated pharmacy inventory',
+                    'prescription_filled': 'Filled prescription order'
+                };
+                return descriptions[activity.action] || 'Unknown activity';
+            }
+
+            formatDate(dateString) {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            formatDateTime(dateString) {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('en-KE', {
+                    style: 'currency',
+                    currency: 'KES',
+                    minimumFractionDigits: 0
+                }).format(amount).replace('KES', '');
+            }
+        }
+
+        // Global functions
+        function quickPrescription() {
+            document.getElementById('quickDispenseModal').classList.remove('hidden');
+        }
+
+        function closeQuickDispenseModal() {
+            pharmacistDashboard.closeQuickDispenseModal();
+        }
+
+        function showPrescriptions() {
+            showToast('Opening prescriptions manager...', 'info');
+        }
+
+        function showInventory() {
+            showToast('Opening inventory manager...', 'info');
+        }
+
+        function showConsultations() {
+            showToast('Opening consultations manager...', 'info');
+        }
+
+        function showRevenue() {
+            showToast('Opening revenue dashboard...', 'info');
+        }
+
+        function drugInteractionCheck() {
+            showToast('Drug interaction checker coming soon!', 'info');
+        }
+
+        function inventoryAlert() {
+            showToast('Low stock alerts feature coming soon!', 'info');
+        }
+
+        function patientHistory() {
+            showToast('Patient history lookup coming soon!', 'info');
+        }
+
+        function emergencyProtocol() {
+            showToast('Emergency protocol guide coming soon!', 'info');
+        }
+
+        function dispensePrescription(prescriptionId) {
+            showToast('Prescription dispense feature coming soon!', 'info');
+        }
+
+        function startConsultation(consultationId) {
+            showToast('Consultation system coming soon!', 'info');
+        }
+
+        function callEmergency(type) {
+            const numbers = {
+                'poison': '999', // Poison Control Center
+                'hospital': '+254-020-2726300', // Kenyatta Hospital
+                'board': '+254-020-2717077' // Pharmacy and Poisons Board
+            };
+            
+            const messages = {
+                'poison': 'Calling Poison Control Center...',
+                'hospital': 'Calling Hospital Emergency...',
+                'board': 'Calling Pharmacy Board...'
+            };
+            
+            showToast(messages[type], 'info');
+            window.open(`tel:${numbers[type]}`, '_self');
+        }
+
+        // Initialize dashboard
+        let pharmacistDashboard;
+        document.addEventListener('DOMContentLoaded', () => {
+            pharmacistDashboard = new PharmacistDashboard();
+        });
+    </script>
+</body>
+</html>

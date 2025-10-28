@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - NSG Health</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+    <link rel="shortcut icon" type="image/jpeg" href="logo.jpeg">
+    <link rel="apple-touch-icon" href="logo.jpeg">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-bg {
+            background: linear-gradient(rgba(10, 46, 76, 0.9), rgba(10, 46, 76, 0.9)), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .role-card.selected {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .role-card.selected .text-blue-600 {
+            color: white !important;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="hero-bg flex items-center justify-center py-8 px-4">
+    <div class="glass-effect rounded-2xl w-full max-w-2xl shadow-2xl fade-in">
+        <!-- Header -->
+        <div class="text-center p-6 border-b border-gray-200">
+            <div class="flex justify-center mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <svg width="40" height="35" viewBox="0 0 40 35" class="text-red-500">
+                            <path d="M20 32C20 32 3 22 3 12C3 7 7 3 12 3C15 3 18 5 20 8C22 5 25 3 28 3C33 3 37 7 37 12C37 22 20 32 20 32Z" fill="currentColor"/>
+                            <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-2xl font-bold text-blue-600">NSG</span>
+                            <span class="text-2xl font-bold text-blue-800">HEALTH</span>
+                        </div>
+                        <span class="text-sm text-blue-600 -mt-1" style="font-family: 'Brush Script MT', cursive; font-style: italic;">Join Our Healthcare Platform</span>
+                    </div>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Create Your Account</h1>
+            <p class="text-gray-600">Join NSG Health and access our comprehensive healthcare platform</p>
+        </div>
+
+        <div class="p-6">
+            <form id="signupForm" class="space-y-6">
+                <!-- Role Selection -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Choose Your Role</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Patient Role -->
+                        <div class="role-card bg-white rounded-lg border-2 border-gray-200 p-4 text-center" data-role="patient">
+                            <div class="mb-3">
+                                <i class="fas fa-user text-4xl text-blue-600"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Patient</h4>
+                            <p class="text-sm text-gray-600">Book appointments, request emergency help, view prescriptions</p>
+                        </div>
+
+                        <!-- Practitioner Role -->
+                        <div class="role-card bg-white rounded-lg border-2 border-gray-200 p-4 text-center" data-role="practitioner">
+                            <div class="mb-3">
+                                <i class="fas fa-user-md text-4xl text-blue-600"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Practitioner</h4>
+                            <p class="text-sm text-gray-600">Manage appointments, respond to SOS alerts, provide consultations</p>
+                        </div>
+
+                        <!-- MedRep Role -->
+                        <div class="role-card bg-white rounded-lg border-2 border-gray-200 p-4 text-center" data-role="medrep">
+                            <div class="mb-3">
+                                <i class="fas fa-medkit text-4xl text-blue-600"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Medical Rep</h4>
+                            <p class="text-sm text-gray-600">Manage equipment listings, track inventory, process orders</p>
+                        </div>
+
+                        <!-- Pharmacist Role -->
+                        <div class="role-card bg-white rounded-lg border-2 border-gray-200 p-4 text-center" data-role="pharmacist">
+                            <div class="mb-3">
+                                <i class="fas fa-pills text-4xl text-blue-600"></i>
+                            </div>
+                            <h4 class="font-semibold text-gray-800 mb-2">Pharmacist</h4>
+                            <p class="text-sm text-gray-600">Manage medicine catalog, handle prescriptions, confirm deliveries</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedRole" name="role" required>
+                    <div id="roleError" class="text-red-500 text-sm mt-2 hidden">Please select a role</div>
+                </div>
+
+                <!-- Personal Information -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="firstName" class="block text-gray-700 font-medium mb-2">First Name</label>
+                        <input type="text" id="firstName" name="firstName" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                               placeholder="Enter your first name">
+                    </div>
+                    <div>
+                        <label for="lastName" class="block text-gray-700 font-medium mb-2">Last Name</label>
+                        <input type="text" id="lastName" name="lastName" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                               placeholder="Enter your last name">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                    <input type="email" id="email" name="email" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                           placeholder="Enter your email address">
+                </div>
+
+                <div>
+                    <label for="phone" class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                           placeholder="Enter your phone number">
+                </div>
+
+                <div>
+                    <label for="location" class="block text-gray-700 font-medium mb-2">Location</label>
+                    <input type="text" id="location" name="location" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                           placeholder="City, County">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required minlength="6"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors pr-12"
+                               placeholder="Create a password (min 6 characters)">
+                        <button type="button" id="togglePassword" class="absolute right-4 top-3 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="confirmPassword" class="block text-gray-700 font-medium mb-2">Confirm Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                           placeholder="Confirm your password">
+                    <div id="passwordError" class="text-red-500 text-sm mt-1 hidden">Passwords do not match</div>
+                </div>
+
+                <!-- Role-specific fields (conditional) -->
+                <div id="practitionerFields" class="hidden space-y-4">
+                    <div>
+                        <label for="licenseNumber" class="block text-gray-700 font-medium mb-2">Medical License Number</label>
+                        <input type="text" id="licenseNumber" name="licenseNumber" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                               placeholder="Enter your license number">
+                    </div>
+                    <div>
+                        <label for="specialization" class="block text-gray-700 font-medium mb-2">Specialization</label>
+                        <select id="specialization" name="specialization" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                            <option value="">Select your specialization</option>
+                            <option value="general">General Practice</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="pediatrics">Pediatrics</option>
+                            <option value="orthopedics">Orthopedics</option>
+                            <option value="dermatology">Dermatology</option>
+                            <option value="psychiatry">Psychiatry</option>
+                            <option value="surgery">Surgery</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="pharmacistFields" class="hidden space-y-4">
+                    <div>
+                        <label for="pharmacyLicense" class="block text-gray-700 font-medium mb-2">Pharmacy License Number</label>
+                        <input type="text" id="pharmacyLicense" name="pharmacyLicense" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                               placeholder="Enter your pharmacy license">
+                    </div>
+                    <div>
+                        <label for="pharmacyName" class="block text-gray-700 font-medium mb-2">Pharmacy Name (Optional)</label>
+                        <input type="text" id="pharmacyName" name="pharmacyName" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                               placeholder="Name of your pharmacy">
+                    </div>
+                </div>
+
+                <div id="medrepFields" class="hidden space-y-4">
+                    <div>
+                        <label for="companyName" class="block text-gray-700 font-medium mb-2">Company Name</label>
+                        <input type="text" id="companyName" name="companyName" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                               placeholder="Medical equipment company">
+                    </div>
+                    <div>
+                        <label for="businessLicense" class="block text-gray-700 font-medium mb-2">Business License Number</label>
+                        <input type="text" id="businessLicense" name="businessLicense" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                               placeholder="Business registration number">
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="flex items-start">
+                    <input type="checkbox" id="terms" name="terms" required class="mt-1 mr-3">
+                    <label for="terms" class="text-sm text-gray-600">
+                        I agree to the <a href="#" class="text-blue-600 hover:underline">Terms of Service</a> and 
+                        <a href="#" class="text-blue-600 hover:underline">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="submitText">Create Account</span>
+                    <i id="submitLoader" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                </button>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                    <p class="text-gray-600">
+                        Already have an account? 
+                        <a href="signin.html" class="text-blue-600 hover:underline font-medium">Sign in here</a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-8 max-w-md mx-4 text-center">
+            <div class="mb-4">
+                <i class="fas fa-check-circle text-6xl text-green-500"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Account Created!</h3>
+            <p class="text-gray-600 mb-6">Your account has been successfully created. You will be redirected to the sign-in page.</p>
+            <button onclick="redirectToSignin()" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-lg">
+                Continue to Sign In
+            </button>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        // Role selection functionality
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selection from all cards
+                document.querySelectorAll('.role-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // Add selection to clicked card
+                this.classList.add('selected');
+                
+                // Set the hidden input value
+                const role = this.dataset.role;
+                document.getElementById('selectedRole').value = role;
+                
+                // Hide all role-specific fields
+                document.getElementById('practitionerFields').classList.add('hidden');
+                document.getElementById('pharmacistFields').classList.add('hidden');
+                document.getElementById('medrepFields').classList.add('hidden');
+                
+                // Show relevant fields based on role
+                if (role === 'practitioner') {
+                    document.getElementById('practitionerFields').classList.remove('hidden');
+                } else if (role === 'pharmacist') {
+                    document.getElementById('pharmacistFields').classList.remove('hidden');
+                } else if (role === 'medrep') {
+                    document.getElementById('medrepFields').classList.remove('hidden');
+                }
+                
+                // Hide error message
+                document.getElementById('roleError').classList.add('hidden');
+            });
+        });
+
+        // Password toggle functionality
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const password = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            const errorDiv = document.getElementById('passwordError');
+            
+            if (confirmPassword && password !== confirmPassword) {
+                errorDiv.classList.remove('hidden');
+            } else {
+                errorDiv.classList.add('hidden');
+            }
+        });
+
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate role selection
+            const selectedRole = document.getElementById('selectedRole').value;
+            if (!selectedRole) {
+                document.getElementById('roleError').classList.remove('hidden');
+                return;
+            }
+            
+            // Validate password confirmation
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            if (password !== confirmPassword) {
+                document.getElementById('passwordError').classList.remove('hidden');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitLoader = document.getElementById('submitLoader');
+            
+            submitBtn.disabled = true;
+            submitText.textContent = 'Creating Account...';
+            submitLoader.classList.remove('hidden');
+            
+            // Collect form data
+            const formData = new FormData(this);
+            const userData = Object.fromEntries(formData.entries());
+            userData.role = selectedRole;
+            userData.createdAt = new Date().toISOString();
+            userData.id = 'user_' + Date.now();
+            
+            // Store user data (demo - would be API call in production)
+            const users = JSON.parse(localStorage.getItem('nsg_users') || '[]');
+            
+            // Check if email already exists
+            if (users.find(user => user.email === userData.email)) {
+                alert('An account with this email already exists');
+                resetSubmitButton();
+                return;
+            }
+            
+            // Add user to storage
+            users.push(userData);
+            localStorage.setItem('nsg_users', JSON.stringify(users));
+            
+            // Simulate API delay
+            setTimeout(() => {
+                resetSubmitButton();
+                document.getElementById('successModal').classList.remove('hidden');
+            }, 2000);
+        });
+
+        function resetSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitLoader = document.getElementById('submitLoader');
+            
+            submitBtn.disabled = false;
+            submitText.textContent = 'Create Account';
+            submitLoader.classList.add('hidden');
+        }
+
+        function redirectToSignin() {
+            window.location.href = 'signin.html';
+        }
+
+        // Auto-focus first input
+        document.getElementById('firstName').focus();
+    </script>
+</body>
+</html>

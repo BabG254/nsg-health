@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - NSG Health</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="logo.jpeg">
+    <link rel="shortcut icon" type="image/jpeg" href="logo.jpeg">
+    <link rel="apple-touch-icon" href="logo.jpeg">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-bg {
+            background: linear-gradient(rgba(10, 46, 76, 0.9), rgba(10, 46, 76, 0.9)), url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .role-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .role-card.selected {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .role-card.selected .text-blue-600 {
+            color: white !important;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="hero-bg flex items-center justify-center py-8 px-4">
+    <div class="glass-effect rounded-2xl w-full max-w-lg shadow-2xl fade-in">
+        <!-- Header -->
+        <div class="text-center p-6 border-b border-gray-200">
+            <div class="flex justify-center mb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <svg width="40" height="35" viewBox="0 0 40 35" class="text-red-500">
+                            <path d="M20 32C20 32 3 22 3 12C3 7 7 3 12 3C15 3 18 5 20 8C22 5 25 3 28 3C33 3 37 7 37 12C37 22 20 32 20 32Z" fill="currentColor"/>
+                            <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="flex items-baseline space-x-1">
+                            <span class="text-2xl font-bold text-blue-600">NSG</span>
+                            <span class="text-2xl font-bold text-blue-800">HEALTH</span>
+                        </div>
+                        <span class="text-sm text-blue-600 -mt-1" style="font-family: 'Brush Script MT', cursive; font-style: italic;">Welcome Back</span>
+                    </div>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Sign In</h1>
+            <p class="text-gray-600">Access your NSG Health dashboard</p>
+        </div>
+
+        <div class="p-6">
+            <!-- Portal Selection (Optional - if coming from homepage portals) -->
+            <div id="portalSelection" class="mb-6 hidden">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">Select Your Portal</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="role-card bg-white rounded-lg border-2 border-gray-200 p-3 text-center" data-role="patient">
+                        <i class="fas fa-user text-2xl text-blue-600 mb-2"></i>
+                        <div class="text-sm font-medium">Patient</div>
+                    </div>
+                    <div class="role-card bg-white rounded-lg border-2 border-gray-200 p-3 text-center" data-role="practitioner">
+                        <i class="fas fa-user-md text-2xl text-blue-600 mb-2"></i>
+                        <div class="text-sm font-medium">Practitioner</div>
+                    </div>
+                    <div class="role-card bg-white rounded-lg border-2 border-gray-200 p-3 text-center" data-role="medrep">
+                        <i class="fas fa-medkit text-2xl text-blue-600 mb-2"></i>
+                        <div class="text-sm font-medium">Medical Rep</div>
+                    </div>
+                    <div class="role-card bg-white rounded-lg border-2 border-gray-200 p-3 text-center" data-role="pharmacist">
+                        <i class="fas fa-pills text-2xl text-blue-600 mb-2"></i>
+                        <div class="text-sm font-medium">Pharmacist</div>
+                    </div>
+                </div>
+                <input type="hidden" id="selectedPortal" name="portal">
+            </div>
+
+            <form id="signinForm" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                    <input type="email" id="email" name="email" required 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                           placeholder="Enter your email address">
+                </div>
+
+                <div>
+                    <label for="password" class="block text-gray-700 font-medium mb-2">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors pr-12"
+                               placeholder="Enter your password">
+                        <button type="button" id="togglePassword" class="absolute right-4 top-3 text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded hidden">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span id="errorText">Invalid email or password</span>
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="rememberMe" name="rememberMe" class="mr-2">
+                        <label for="rememberMe" class="text-sm text-gray-600">Remember me</label>
+                    </div>
+                    <a href="#" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span id="submitText">Sign In</span>
+                    <i id="submitLoader" class="fas fa-spinner fa-spin ml-2 hidden"></i>
+                </button>
+
+                <!-- Demo Accounts -->
+                <div class="border-t pt-6">
+                    <h4 class="text-sm font-medium text-gray-700 mb-3 text-center">Demo Accounts (Click to Auto-fill)</h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <button type="button" class="demo-btn bg-gray-100 hover:bg-gray-200 p-2 rounded text-left transition-colors"
+                                data-email="patient@demo.com" data-password="demo123" data-role="patient">
+                            <div class="font-medium text-blue-600">Patient Demo</div>
+                            <div class="text-gray-600">patient@demo.com</div>
+                        </button>
+                        <button type="button" class="demo-btn bg-gray-100 hover:bg-gray-200 p-2 rounded text-left transition-colors"
+                                data-email="doctor@demo.com" data-password="demo123" data-role="practitioner">
+                            <div class="font-medium text-green-600">Doctor Demo</div>
+                            <div class="text-gray-600">doctor@demo.com</div>
+                        </button>
+                        <button type="button" class="demo-btn bg-gray-100 hover:bg-gray-200 p-2 rounded text-left transition-colors"
+                                data-email="medrep@demo.com" data-password="demo123" data-role="medrep">
+                            <div class="font-medium text-purple-600">MedRep Demo</div>
+                            <div class="text-gray-600">medrep@demo.com</div>
+                        </button>
+                        <button type="button" class="demo-btn bg-gray-100 hover:bg-gray-200 p-2 rounded text-left transition-colors"
+                                data-email="pharmacist@demo.com" data-password="demo123" data-role="pharmacist">
+                            <div class="font-medium text-orange-600">Pharmacist Demo</div>
+                            <div class="text-gray-600">pharmacist@demo.com</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Signup Link -->
+                <div class="text-center">
+                    <p class="text-gray-600">
+                        Don't have an account? 
+                        <a href="signup.html" class="text-blue-600 hover:underline font-medium">Sign up here</a>
+                    </p>
+                </div>
+
+                <!-- Back to Home -->
+                <div class="text-center">
+                    <a href="index.html" class="text-gray-500 hover:text-gray-700 text-sm">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Homepage
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        // Check if we came from a specific portal
+        const urlParams = new URLSearchParams(window.location.search);
+        const preselectedRole = urlParams.get('role');
+        
+        if (preselectedRole) {
+            document.getElementById('portalSelection').classList.remove('hidden');
+            // Auto-select the role
+            const roleCard = document.querySelector(`[data-role="${preselectedRole}"]`);
+            if (roleCard) {
+                roleCard.classList.add('selected');
+                document.getElementById('selectedPortal').value = preselectedRole;
+            }
+        }
+
+        // Portal selection functionality
+        document.querySelectorAll('.role-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.role-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                this.classList.add('selected');
+                document.getElementById('selectedPortal').value = this.dataset.role;
+            });
+        });
+
+        // Password toggle functionality
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const password = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+
+        // Demo account functionality
+        document.querySelectorAll('.demo-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const email = this.dataset.email;
+                const password = this.dataset.password;
+                const role = this.dataset.role;
+                
+                document.getElementById('email').value = email;
+                document.getElementById('password').value = password;
+                
+                // Auto-select the portal if visible
+                if (!document.getElementById('portalSelection').classList.contains('hidden')) {
+                    document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+                    const roleCard = document.querySelector(`[data-role="${role}"]`);
+                    if (roleCard) {
+                        roleCard.classList.add('selected');
+                        document.getElementById('selectedPortal').value = role;
+                    }
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('signinForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const selectedPortal = document.getElementById('selectedPortal').value;
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitLoader = document.getElementById('submitLoader');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            submitBtn.disabled = true;
+            submitText.textContent = 'Signing In...';
+            submitLoader.classList.remove('hidden');
+            errorDiv.classList.add('hidden');
+            
+            // Simulate API delay
+            setTimeout(() => {
+                // Check demo accounts first
+                const demoAccounts = {
+                    'patient@demo.com': { password: 'demo123', role: 'patient', name: 'Patient Demo' },
+                    'doctor@demo.com': { password: 'demo123', role: 'practitioner', name: 'Dr. Demo' },
+                    'medrep@demo.com': { password: 'demo123', role: 'medrep', name: 'MedRep Demo' },
+                    'pharmacist@demo.com': { password: 'demo123', role: 'pharmacist', name: 'Pharmacist Demo' }
+                };
+                
+                let user = null;
+                
+                // Check demo accounts
+                if (demoAccounts[email] && demoAccounts[email].password === password) {
+                    user = {
+                        id: 'demo_' + demoAccounts[email].role,
+                        email: email,
+                        role: demoAccounts[email].role,
+                        firstName: demoAccounts[email].name.split(' ')[0],
+                        lastName: demoAccounts[email].name.split(' ')[1] || '',
+                        isDemo: true
+                    };
+                } else {
+                    // Check registered users
+                    const users = JSON.parse(localStorage.getItem('nsg_users') || '[]');
+                    user = users.find(u => u.email === email && u.password === password);
+                }
+                
+                if (user) {
+                    // Check if portal selection matches user role (if portal was preselected)
+                    if (selectedPortal && selectedPortal !== user.role) {
+                        showError('This account is not authorized for the selected portal');
+                        resetSubmitButton();
+                        return;
+                    }
+                    
+                    // Store session
+                    const session = {
+                        user: user,
+                        loginTime: new Date().toISOString(),
+                        rememberMe: document.getElementById('rememberMe').checked
+                    };
+                    
+                    localStorage.setItem('nsg_session', JSON.stringify(session));
+                    
+                    // Redirect to appropriate dashboard
+                    const dashboardUrls = {
+                        'patient': 'dashboards/patient.html',
+                        'practitioner': 'dashboards/practitioner.html',
+                        'medrep': 'dashboards/medrep.html',
+                        'pharmacist': 'dashboards/pharmacist.html'
+                    };
+                    
+                    window.location.href = dashboardUrls[user.role] || 'dashboards/patient.html';
+                } else {
+                    showError('Invalid email or password');
+                    resetSubmitButton();
+                    
+                    // Add shake animation to form
+                    document.getElementById('signinForm').classList.add('shake');
+                    setTimeout(() => {
+                        document.getElementById('signinForm').classList.remove('shake');
+                    }, 500);
+                }
+            }, 1500);
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            
+            errorText.textContent = message;
+            errorDiv.classList.remove('hidden');
+        }
+
+        function resetSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitLoader = document.getElementById('submitLoader');
+            
+            submitBtn.disabled = false;
+            submitText.textContent = 'Sign In';
+            submitLoader.classList.add('hidden');
+        }
+
+        // Auto-focus email input
+        document.getElementById('email').focus();
+    </script>
+</body>
+</html>

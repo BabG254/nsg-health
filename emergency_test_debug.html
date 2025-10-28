@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Button Quick Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .floating-btn {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8">Emergency Button Test</h1>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Test Buttons -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-bold mb-4">Test Functions</h2>
+                <div class="space-y-3">
+                    <button onclick="testToggleSOSMenu()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700">
+                        Test Toggle SOS Menu
+                    </button>
+                    <button onclick="testTriggerQuickSOS()" class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700">
+                        Test Quick SOS
+                    </button>
+                    <button onclick="testTriggerSOS()" class="w-full bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-700">
+                        Test Regular SOS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Log Output -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-bold mb-4">Test Log</h2>
+                <div id="testLog" class="bg-gray-50 p-4 rounded border h-64 overflow-y-auto text-sm font-mono">
+                    Ready to test...
+                </div>
+                <button onclick="clearLog()" class="mt-2 bg-gray-500 text-white py-1 px-3 rounded text-sm">
+                    Clear Log
+                </button>
+            </div>
+        </div>
+
+        <!-- Floating Emergency Button (Same as main site) -->
+        <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+            <div class="relative group">
+                <button id="mainSOSBtn" onclick="toggleSOSMenu()" class="floating-btn bg-red-600 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors" title="Emergency SOS">
+                    <i class="fas fa-exclamation-triangle text-2xl animate-pulse"></i>
+                </button>
+                
+                <div id="sosMenu" class="hidden absolute bottom-20 right-0 bg-white rounded-lg shadow-xl border border-gray-200 p-2 min-w-48">
+                    <button onclick="triggerQuickSOS(); hideSOSMenu()" class="w-full text-left p-3 hover:bg-red-50 rounded-lg transition-colors border-l-4 border-red-500">
+                        <div class="font-bold text-red-800 text-sm">🚨 QUICK SOS</div>
+                        <div class="text-xs text-red-600">Life-threatening emergency</div>
+                        <div class="text-xs text-gray-500">Minimal questions</div>
+                    </button>
+                    
+                    <button onclick="triggerSOS('medical'); hideSOSMenu()" class="w-full text-left p-3 hover:bg-orange-50 rounded-lg transition-colors border-l-4 border-orange-500 mt-1">
+                        <div class="font-bold text-orange-800 text-sm">Regular SOS</div>
+                        <div class="text-xs text-orange-600">Medical emergency</div>
+                        <div class="text-xs text-gray-500">Full assessment</div>
+                    </button>
+
+                    <div class="border-t border-gray-200 mt-2 pt-2">
+                        <div class="text-xs text-gray-600 mb-2 px-3">Emergency Contacts:</div>
+                        <a href="tel:999" class="block w-full text-left p-2 hover:bg-gray-50 rounded text-xs">
+                            <span class="font-bold text-red-600">999</span> - Emergency Services
+                        </a>
+                        <a href="tel:+254700894381" class="block w-full text-left p-2 hover:bg-gray-50 rounded text-xs">
+                            <span class="font-bold text-blue-600">NSG Health</span> - Direct Call
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include SOS System -->
+    <script src="sos.js"></script>
+    <script src="dashboards/dashboard.js"></script>
+    
+    <script>
+        // Test logging
+        function log(message) {
+            const logElement = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = 'Log cleared...\n';
+        }
+
+        // Toast function fallback
+        if (typeof showToast === 'undefined') {
+            window.showToast = function(message, type = 'info', duration = 4000) {
+                log(`Toast (${type}): ${message}`);
+            };
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page loaded, initializing...');
+            
+            // Try to initialize SOS system
+            if (typeof SOSEmergencySystem !== 'undefined') {
+                try {
+                    window.sosSystem = new SOSEmergencySystem();
+                    log('✅ SOS Emergency System initialized successfully');
+                } catch (error) {
+                    log('❌ Failed to initialize SOS system: ' + error.message);
+                    window.sosSystem = null;
+                }
+            } else {
+                log('⚠️ SOS Emergency System not available, using fallback');
+                window.sosSystem = null;
+            }
+
+            // Add event listener to floating button
+            const floatingBtn = document.getElementById('mainSOSBtn');
+            if (floatingBtn) {
+                floatingBtn.addEventListener('click', function(e) {
+                    log('🔴 Floating SOS button clicked (event listener)');
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+                log('✅ Floating SOS button found and event listener added');
+            } else {
+                log('❌ Floating SOS button not found!');
+            }
+        });
+
+        // Test Functions
+        function testToggleSOSMenu() {
+            log('Testing toggleSOSMenu()...');
+            try {
+                toggleSOSMenu();
+                log('✅ toggleSOSMenu() executed successfully');
+            } catch (error) {
+                log('❌ Error in toggleSOSMenu(): ' + error.message);
+            }
+        }
+
+        function testTriggerQuickSOS() {
+            log('Testing triggerQuickSOS()...');
+            try {
+                triggerQuickSOS();
+                log('✅ triggerQuickSOS() executed successfully');
+            } catch (error) {
+                log('❌ Error in triggerQuickSOS(): ' + error.message);
+            }
+        }
+
+        function testTriggerSOS() {
+            log('Testing triggerSOS()...');
+            try {
+                triggerSOS('medical');
+                log('✅ triggerSOS() executed successfully');
+            } catch (error) {
+                log('❌ Error in triggerSOS(): ' + error.message);
+            }
+        }
+
+        // Emergency Functions (same as main site)
+        function toggleSOSMenu() {
+            log('toggleSOSMenu() called');
+            const menu = document.getElementById('sosMenu');
+            const button = document.getElementById('mainSOSBtn');
+            
+            if (!menu) {
+                log('❌ SOS menu element not found!');
+                triggerQuickSOS();
+                return;
+            }
+            
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                log('✅ SOS menu opened');
+                setTimeout(() => {
+                    document.addEventListener('click', closeSOSOnOutsideClick, { once: true });
+                }, 100);
+            } else {
+                menu.classList.add('hidden');
+                log('✅ SOS menu closed');
+            }
+        }
+
+        function hideSOSMenu() {
+            const menu = document.getElementById('sosMenu');
+            if (menu) {
+                menu.classList.add('hidden');
+                log('✅ SOS menu hidden');
+            }
+        }
+
+        function closeSOSOnOutsideClick(event) {
+            const menu = document.getElementById('sosMenu');
+            const button = document.getElementById('mainSOSBtn');
+            if (!menu.contains(event.target) && !button.contains(event.target)) {
+                menu.classList.add('hidden');
+                log('✅ SOS menu closed (outside click)');
+            }
+        }
+
+        function triggerQuickSOS() {
+            log('triggerQuickSOS() called');
+            if (typeof sosSystem !== 'undefined' && sosSystem) {
+                log('Using SOS system for Quick SOS');
+                sosSystem.startEmergencyRequest('medical', { quickSOS: true });
+            } else {
+                log('Using fallback for Quick SOS');
+                if (confirm('🚨 CRITICAL EMERGENCY\n\nThis will start emergency assistance with minimal questions.\n\nIf this is life-threatening, you should also call 999 immediately.\n\nContinue with Quick SOS?')) {
+                    const phone = prompt('Enter your phone number for emergency response:');
+                    if (phone) {
+                        log('✅ Quick SOS activated with phone: ' + phone);
+                        alert('🚨 Emergency services have been notified!\n\nPhone: ' + phone + '\nHelp is on the way.\n\nFor immediate assistance, call 999 or 112');
+                    }
+                }
+            }
+        }
+
+        function triggerSOS(type = 'medical') {
+            log('triggerSOS() called with type: ' + type);
+            if (typeof sosSystem !== 'undefined' && sosSystem) {
+                log('Using SOS system for Regular SOS');
+                sosSystem.startEmergencyRequest(type);
+            } else {
+                log('Using fallback for Regular SOS');
+                if (confirm('Request emergency medical assistance?\n\nThis will connect you with our emergency response team.')) {
+                    const phone = prompt('Enter your phone number for emergency response:');
+                    if (phone) {
+                        log('✅ Regular SOS activated with phone: ' + phone);
+                        alert('Emergency services have been notified!\n\nPhone: ' + phone + '\nHelp is on the way.\n\nFor assistance, call +254 700 894 381');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

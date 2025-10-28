@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Button Test - NSG Health</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold text-blue-800 mb-8">Emergency Button Test</h1>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-bold mb-4">Test Emergency Functions</h2>
+            
+            <div class="space-y-4">
+                <button onclick="triggerQuickSOS()" class="w-full bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-700 transition-colors font-bold">
+                    🚨 Test Quick SOS
+                </button>
+                
+                <button onclick="triggerSOS('medical')" class="w-full bg-orange-600 text-white py-3 px-6 rounded-lg hover:bg-orange-700 transition-colors font-medium">
+                    Test Regular SOS
+                </button>
+                
+                <button onclick="toggleSOSMenu()" class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    Test SOS Menu Toggle
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+            <h3 class="font-bold text-yellow-800 mb-2">Test Results:</h3>
+            <div id="testResults" class="text-sm text-yellow-700">
+                Click the buttons above to test emergency functionality.
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating SOS Button (same as main site) -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+        <div class="relative group">
+            <button id="mainSOSBtn" onclick="toggleSOSMenu()" class="floating-btn bg-red-600 text-white w-16 h-16 rounded-full flex items-center justify-center shadow-lg hover:bg-red-700 transition-colors" title="Emergency SOS">
+                <i class="fas fa-exclamation-triangle text-2xl animate-pulse"></i>
+            </button>
+            
+            <div id="sosMenu" class="hidden absolute bottom-20 right-0 bg-white rounded-lg shadow-xl border border-gray-200 p-2 min-w-48">
+                <button onclick="triggerQuickSOS(); hideSOSMenu()" class="w-full text-left p-3 hover:bg-red-50 rounded-lg transition-colors border-l-4 border-red-500">
+                    <div class="font-bold text-red-800 text-sm">🚨 QUICK SOS</div>
+                    <div class="text-xs text-red-600">Life-threatening emergency</div>
+                    <div class="text-xs text-gray-500">Minimal questions</div>
+                </button>
+                
+                <button onclick="triggerSOS('medical'); hideSOSMenu()" class="w-full text-left p-3 hover:bg-orange-50 rounded-lg transition-colors border-l-4 border-orange-500 mt-1">
+                    <div class="font-bold text-orange-800 text-sm">Regular SOS</div>
+                    <div class="text-xs text-orange-600">Medical emergency</div>
+                    <div class="text-xs text-gray-500">Full assessment</div>
+                </button>
+
+                <div class="border-t border-gray-200 mt-2 pt-2">
+                    <div class="text-xs text-gray-600 mb-2 px-3">Emergency Contacts:</div>
+                    <a href="tel:999" class="block w-full text-left p-2 hover:bg-gray-50 rounded text-xs">
+                        <span class="font-bold text-red-600">999</span> - Emergency Services
+                    </a>
+                    <a href="tel:+254700894381" class="block w-full text-left p-2 hover:bg-gray-50 rounded text-xs">
+                        <span class="font-bold text-blue-600">NSG Health</span> - Direct Call
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include SOS System -->
+    <script src="sos.js"></script>
+    <script src="dashboards/dashboard.js"></script>
+    
+    <script>
+        // Test logging function
+        function logTest(message) {
+            const results = document.getElementById('testResults');
+            results.innerHTML += '<br>• ' + message;
+        }
+
+        // Toast function fallback
+        if (typeof showToast === 'undefined') {
+            window.showToast = function(message, type = 'info', duration = 4000) {
+                logTest(`Toast (${type}): ${message}`);
+                console.log(`${type.toUpperCase()}: ${message}`);
+            };
+        }
+
+        // Initialize SOS system
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof SOSEmergencySystem !== 'undefined') {
+                window.sosSystem = new SOSEmergencySystem();
+                logTest('SOS Emergency System initialized successfully');
+            } else {
+                logTest('SOS Emergency System not available, using fallback');
+            }
+        });
+
+        // SOS Menu functions
+        function toggleSOSMenu() {
+            logTest('toggleSOSMenu called');
+            const menu = document.getElementById('sosMenu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                logTest('SOS Menu opened');
+                setTimeout(() => {
+                    document.addEventListener('click', closeSOSOnOutsideClick, { once: true });
+                }, 100);
+            } else {
+                menu.classList.add('hidden');
+                logTest('SOS Menu closed');
+            }
+        }
+
+        function hideSOSMenu() {
+            document.getElementById('sosMenu').classList.add('hidden');
+            logTest('SOS Menu hidden');
+        }
+
+        function closeSOSOnOutsideClick(event) {
+            const menu = document.getElementById('sosMenu');
+            const button = document.getElementById('mainSOSBtn');
+            if (!menu.contains(event.target) && !button.contains(event.target)) {
+                menu.classList.add('hidden');
+                logTest('SOS Menu closed (outside click)');
+            }
+        }
+
+        // Quick SOS function
+        function triggerQuickSOS() {
+            logTest('triggerQuickSOS called');
+            if (typeof sosSystem !== 'undefined' && sosSystem) {
+                logTest('Using SOS system for Quick SOS');
+                sosSystem.startEmergencyRequest('medical', { quickSOS: true });
+            } else {
+                logTest('Using fallback for Quick SOS');
+                if (confirm('🚨 CRITICAL EMERGENCY\n\nThis will start emergency assistance with minimal questions.\n\nIf this is life-threatening, you should also call 999 immediately.\n\nContinue with Quick SOS?')) {
+                    const phone = prompt('Enter your phone number for emergency response:');
+                    if (phone) {
+                        logTest('Quick SOS activated with phone: ' + phone);
+                        alert('🚨 Emergency services have been notified!\n\nPhone: ' + phone + '\nHelp is on the way.\n\nFor immediate assistance, call 999 or 112');
+                    }
+                }
+            }
+        }
+
+        // Regular SOS function
+        function triggerSOS(type = 'medical') {
+            logTest('triggerSOS called with type: ' + type);
+            if (typeof sosSystem !== 'undefined' && sosSystem) {
+                logTest('Using SOS system for Regular SOS');
+                sosSystem.startEmergencyRequest(type);
+            } else {
+                logTest('Using fallback for Regular SOS');
+                if (confirm('Request emergency medical assistance?\n\nThis will connect you with our emergency response team.')) {
+                    const phone = prompt('Enter your phone number for emergency response:');
+                    if (phone) {
+                        logTest('Regular SOS activated with phone: ' + phone);
+                        alert('Emergency services have been notified!\n\nPhone: ' + phone + '\nHelp is on the way.\n\nFor assistance, call +254 700 894 381');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

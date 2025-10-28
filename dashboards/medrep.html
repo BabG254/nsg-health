@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Representative Dashboard - NSG Health</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="../logo.jpeg">
+    <link rel="shortcut icon" type="image/jpeg" href="../logo.jpeg">
+    <link rel="apple-touch-icon" href="../logo.jpeg">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .inventory-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .orders-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .add-product-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+        
+        .analytics-card {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <svg width="32" height="28" viewBox="0 0 40 35" class="text-red-500">
+                                <path d="M20 32C20 32 3 22 3 12C3 7 7 3 12 3C15 3 18 5 20 8C22 5 25 3 28 3C33 3 37 7 37 12C37 22 20 32 20 32Z" fill="currentColor"/>
+                                <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="flex items-baseline space-x-1">
+                                <span class="text-xl font-bold text-blue-600">NSG</span>
+                                <span class="text-xl font-bold text-blue-800">HEALTH</span>
+                            </div>
+                            <span class="text-xs text-blue-600 -mt-1">Medical Rep Portal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Quick Actions -->
+                    <button onclick="openAddProductModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-plus mr-2"></i>Add Product
+                    </button>
+
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 bg-blue-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">4</span>
+                    </button>
+
+                    <!-- User Menu -->
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-3 text-gray-700 hover:text-gray-900">
+                            <div id="userAvatar"></div>
+                            <div class="hidden sm:block text-left">
+                                <div id="userName" class="font-medium"></div>
+                                <div class="text-sm text-gray-500">Medical Rep</div>
+                            </div>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+                        
+                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-building mr-2"></i>Company Info
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <a href="../index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-home mr-2"></i>Main Site
+                            </a>
+                            <div class="border-t border-gray-100"></div>
+                            <button onclick="nsgAuth.logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 id="welcomeMessage" class="text-3xl font-bold text-gray-900 mb-2"></h1>
+            <p class="text-gray-600">Manage your medical equipment inventory, track orders, and grow your business</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Inventory Management -->
+            <div class="inventory-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showInventory()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Inventory</h3>
+                        <p class="text-sm opacity-90">Manage your products</p>
+                        <div class="mt-2">
+                            <span id="totalProducts" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">products</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-boxes text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Orders -->
+            <div class="orders-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showOrders()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Orders</h3>
+                        <p class="text-sm opacity-90">Track sales & deliveries</p>
+                        <div class="mt-2">
+                            <span id="pendingOrders" class="text-2xl font-bold">0</span>
+                            <span class="text-sm opacity-75">pending</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-shopping-cart text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Add Products -->
+            <div class="add-product-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="openAddProductModal()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Add Product</h3>
+                        <p class="text-sm opacity-90">List new equipment</p>
+                        <div class="mt-2">
+                            <span class="text-sm opacity-75">Expand your catalog</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-plus-circle text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Analytics -->
+            <div class="analytics-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showAnalytics()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Analytics</h3>
+                        <p class="text-sm opacity-90">Sales performance</p>
+                        <div class="mt-2">
+                            <span id="monthlyRevenue" class="text-2xl font-bold">KSh 0</span>
+                            <span class="text-sm opacity-75">this month</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chart-line text-3xl opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Product Management & Orders -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Recent Products -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">Your Products</h3>
+                        <button onclick="openAddProductModal()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            + Add New
+                        </button>
+                    </div>
+                    <div id="productsList" class="space-y-3">
+                        <!-- Products will be loaded here -->
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-boxes text-4xl mb-3"></i>
+                            <p>No products listed yet</p>
+                            <button onclick="openAddProductModal()" class="mt-2 text-blue-600 hover:text-blue-800">Add your first product</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">Recent Orders</h3>
+                        <button onclick="showOrders()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            View All
+                        </button>
+                    </div>
+                    <div id="ordersList" class="space-y-3">
+                        <!-- Orders will be loaded here -->
+                        <div class="text-center py-6 text-gray-500">
+                            <i class="fas fa-shopping-cart text-3xl mb-2"></i>
+                            <p>No orders yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                    <div id="activityList" class="space-y-3">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Statistics & Tools -->
+            <div class="space-y-6">
+                <!-- Business Statistics -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Business Statistics</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Total Products</span>
+                            <span id="statTotalProducts" class="font-semibold text-blue-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Active Listings</span>
+                            <span id="statActiveListings" class="font-semibold text-green-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Pending Orders</span>
+                            <span id="statPendingOrders" class="font-semibold text-orange-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Completed Sales</span>
+                            <span id="statCompletedSales" class="font-semibold text-purple-600">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Tools -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Quick Tools</h3>
+                    <div class="space-y-2">
+                        <button onclick="bulkInventoryUpdate()" class="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
+                            <i class="fas fa-upload text-blue-600 mr-3"></i>
+                            <span class="text-blue-800">Bulk Inventory Update</span>
+                        </button>
+                        <button onclick="exportOrders()" class="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
+                            <i class="fas fa-download text-green-600 mr-3"></i>
+                            <span class="text-green-800">Export Orders</span>
+                        </button>
+                        <button onclick="generateReport()" class="w-full text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors">
+                            <i class="fas fa-chart-bar text-purple-600 mr-3"></i>
+                            <span class="text-purple-800">Generate Report</span>
+                        </button>
+                        <button onclick="contactSupport()" class="w-full text-left p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors">
+                            <i class="fas fa-headset text-orange-600 mr-3"></i>
+                            <span class="text-orange-800">Contact Support</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Market Insights -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Market Insights</h3>
+                    <div class="space-y-3">
+                        <div class="p-3 bg-blue-50 rounded-lg">
+                            <div class="font-medium text-blue-800">Top Category</div>
+                            <div class="text-sm text-blue-600">Bandages & Dressings</div>
+                            <div class="text-xs text-blue-500">+15% this month</div>
+                        </div>
+                        <div class="p-3 bg-green-50 rounded-lg">
+                            <div class="font-medium text-green-800">Best Seller</div>
+                            <div class="text-sm text-green-600">ZOP Bandages</div>
+                            <div class="text-xs text-green-500">50+ units sold</div>
+                        </div>
+                        <div class="p-3 bg-yellow-50 rounded-lg">
+                            <div class="font-medium text-yellow-800">Low Stock Alert</div>
+                            <div class="text-sm text-yellow-600">3 products running low</div>
+                            <div class="text-xs text-yellow-500">Restock soon</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg w-full max-w-2xl mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold">Add New Product</h3>
+                    <button onclick="closeAddProductModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="addProductForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Product Name</label>
+                            <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                   placeholder="e.g., Zinc Oxide Bandage">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Category</label>
+                            <select name="category" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select category</option>
+                                <option value="bandages">Bandages & Dressings</option>
+                                <option value="gloves">Gloves & Protection</option>
+                                <option value="syringes">Syringes & Needles</option>
+                                <option value="catheters">Catheters & Tubes</option>
+                                <option value="diagnostic">Diagnostic Tools</option>
+                                <option value="surgical">Surgical Supplies</option>
+                                <option value="lab">Lab Testing</option>
+                                <option value="monitors">Monitors & Devices</option>
+                                <option value="respiratory">Respiratory Equipment</option>
+                                <option value="mobility">Mobility Aids</option>
+                                <option value="general">General Medical</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Description</label>
+                        <textarea name="description" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                  placeholder="Detailed product description"></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Price (KSh)</label>
+                            <input type="number" name="price" required min="0" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                   placeholder="0.00">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Stock Quantity</label>
+                            <input type="number" name="stock" required min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                                   placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Unit</label>
+                            <select name="unit" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select unit</option>
+                                <option value="piece">Piece</option>
+                                <option value="pack">Pack</option>
+                                <option value="box">Box</option>
+                                <option value="bottle">Bottle</option>
+                                <option value="tube">Tube</option>
+                                <option value="roll">Roll</option>
+                                <option value="kit">Kit</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Variants (Optional)</label>
+                        <input type="text" name="variants" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                               placeholder="e.g., Small - KSh 50, Medium - KSh 75, Large - KSh 100">
+                        <div class="text-xs text-gray-500 mt-1">Separate variants with commas</div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Product Image URL (Optional)</label>
+                        <input type="url" name="image" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                               placeholder="https://example.com/image.jpg">
+                    </div>
+                    
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeAddProductModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Add Product
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../auth.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+        // Medical Rep Dashboard specific functionality
+        class MedRepDashboard {
+            constructor() {
+                this.user = nsgAuth.getCurrentUser();
+                this.products = this.loadProducts();
+                this.orders = this.loadOrders();
+                this.initDashboard();
+            }
+
+            initDashboard() {
+                if (!this.user || this.user.role !== 'medrep') {
+                    window.location.href = '../signin.html?error=unauthorized';
+                    return;
+                }
+
+                this.setupUserInfo();
+                this.setupEventListeners();
+                this.loadDashboardData();
+                this.setupProductForm();
+                this.syncWithMainSite();
+            }
+
+            setupUserInfo() {
+                document.getElementById('userName').textContent = nsgAuth.getDisplayName(this.user);
+                document.getElementById('userAvatar').innerHTML = nsgAuth.getUserAvatar(this.user);
+                document.getElementById('welcomeMessage').textContent = `Welcome, ${this.user.firstName}!`;
+
+                // Setup user menu toggle
+                document.getElementById('userMenuBtn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('userMenu').classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', () => {
+                    document.getElementById('userMenu').classList.add('hidden');
+                });
+            }
+
+            setupEventListeners() {
+                // Add any additional event listeners here
+            }
+
+            loadDashboardData() {
+                this.updateStatistics();
+                this.displayProducts();
+                this.displayOrders();
+                this.loadRecentActivity();
+            }
+
+            updateStatistics() {
+                const activeProducts = this.products.filter(p => p.status === 'active').length;
+                const pendingOrders = this.orders.filter(o => o.status === 'pending').length;
+                const completedSales = this.orders.filter(o => o.status === 'completed').length;
+                
+                const monthlyRevenue = this.orders
+                    .filter(o => o.status === 'completed' && this.isThisMonth(o.createdAt))
+                    .reduce((sum, order) => sum + (order.total || 0), 0);
+
+                // Update dashboard stats
+                document.getElementById('totalProducts').textContent = this.products.length;
+                document.getElementById('pendingOrders').textContent = pendingOrders;
+                document.getElementById('monthlyRevenue').textContent = this.formatCurrency(monthlyRevenue);
+
+                // Update detailed stats
+                document.getElementById('statTotalProducts').textContent = this.products.length;
+                document.getElementById('statActiveListings').textContent = activeProducts;
+                document.getElementById('statPendingOrders').textContent = pendingOrders;
+                document.getElementById('statCompletedSales').textContent = completedSales;
+            }
+
+            displayProducts() {
+                const productsList = document.getElementById('productsList');
+                const recentProducts = this.products.slice(0, 5);
+
+                if (recentProducts.length === 0) {
+                    productsList.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-boxes text-4xl mb-3"></i>
+                            <p>No products listed yet</p>
+                            <button onclick="openAddProductModal()" class="mt-2 text-blue-600 hover:text-blue-800">Add your first product</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                productsList.innerHTML = recentProducts.map(product => `
+                    <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                ${product.image ? 
+                                    `<img src="${product.image}" alt="${product.name}" class="w-10 h-10 object-cover rounded">` :
+                                    `<i class="fas fa-box text-blue-600"></i>`
+                                }
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">${product.name}</div>
+                                <div class="text-sm text-gray-600">${product.category} • Stock: ${product.stock}</div>
+                                <div class="text-xs text-gray-500">Added ${this.formatDate(product.createdAt)}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold text-green-600">KSh ${product.price}</div>
+                            <span class="inline-block px-2 py-1 bg-${product.stock > 10 ? 'green' : 'yellow'}-100 text-${product.stock > 10 ? 'green' : 'yellow'}-800 rounded-full text-xs font-medium">
+                                ${product.stock > 10 ? 'In Stock' : 'Low Stock'}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            displayOrders() {
+                const ordersList = document.getElementById('ordersList');
+                const recentOrders = this.orders.slice(0, 3);
+
+                if (recentOrders.length === 0) {
+                    ordersList.innerHTML = `
+                        <div class="text-center py-6 text-gray-500">
+                            <i class="fas fa-shopping-cart text-3xl mb-2"></i>
+                            <p>No orders yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                ordersList.innerHTML = recentOrders.map(order => `
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-shopping-bag text-purple-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-gray-900">Order #${order.id.slice(-6)}</div>
+                                <div class="text-sm text-gray-600">${order.customerName}</div>
+                                <div class="text-xs text-gray-500">${this.formatDate(order.createdAt)}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-semibold text-purple-600">KSh ${order.total}</div>
+                            <span class="inline-block px-2 py-1 bg-${this.getOrderStatusColor(order.status)}-100 text-${this.getOrderStatusColor(order.status)}-800 rounded-full text-xs font-medium">
+                                ${order.status}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            loadRecentActivity() {
+                const activities = nsgAuth.getUserActivities(this.user.id, 5);
+                const activityList = document.getElementById('activityList');
+
+                if (activities.length === 0) {
+                    activityList.innerHTML = `
+                        <div class="text-center py-4 text-gray-500">
+                            <i class="fas fa-history text-2xl mb-2"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                activityList.innerHTML = activities.map(activity => `
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-${this.getActivityIcon(activity.action)} text-blue-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">${this.getActivityDescription(activity)}</div>
+                            <div class="text-xs text-gray-500">${this.formatDate(activity.timestamp)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            setupProductForm() {
+                document.getElementById('addProductForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addProduct(e.target);
+                });
+            }
+
+            addProduct(form) {
+                const formData = new FormData(form);
+                const productData = {
+                    id: 'prod_' + Date.now(),
+                    supplierId: this.user.id,
+                    supplierName: nsgAuth.getDisplayName(this.user),
+                    supplierCompany: this.user.companyName || 'Medical Supply Co.',
+                    name: formData.get('name'),
+                    category: formData.get('category'),
+                    description: formData.get('description'),
+                    price: parseFloat(formData.get('price')),
+                    stock: parseInt(formData.get('stock')),
+                    unit: formData.get('unit'),
+                    variants: formData.get('variants'),
+                    image: formData.get('image'),
+                    status: 'active',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+
+                // Add to products
+                this.products.unshift(productData);
+                this.saveProducts();
+
+                // Sync to main site equipment list
+                this.syncToMainSite(productData);
+
+                // Log activity
+                nsgAuth.logActivity('product_added', {
+                    productName: productData.name,
+                    category: productData.category,
+                    price: productData.price
+                });
+
+                showToast('Product added successfully!', 'success');
+                this.closeAddProductModal();
+                form.reset();
+
+                // Refresh dashboard
+                this.loadDashboardData();
+            }
+
+            syncToMainSite(product) {
+                // Get existing equipment from main site
+                const equipment = JSON.parse(localStorage.getItem('nsg_equipment') || '[]');
+                
+                // Add this product to the equipment list
+                equipment.push(product);
+                
+                // Save back to main site
+                localStorage.setItem('nsg_equipment', JSON.stringify(equipment));
+                localStorage.setItem('nsg_last_update', Date.now().toString());
+            }
+
+            syncWithMainSite() {
+                // Sync all products to main site equipment catalog
+                const equipment = JSON.parse(localStorage.getItem('nsg_equipment') || '[]');
+                const myProducts = this.products.filter(p => p.supplierId === this.user.id);
+                
+                // Remove old products from this supplier
+                const otherEquipment = equipment.filter(e => e.supplierId !== this.user.id);
+                
+                // Add current products
+                const updatedEquipment = [...otherEquipment, ...myProducts];
+                
+                localStorage.setItem('nsg_equipment', JSON.stringify(updatedEquipment));
+                localStorage.setItem('nsg_last_update', Date.now().toString());
+            }
+
+            closeAddProductModal() {
+                document.getElementById('addProductModal').classList.add('hidden');
+            }
+
+            // Utility methods
+            loadProducts() {
+                const allProducts = JSON.parse(localStorage.getItem('nsg_products') || '[]');
+                return allProducts.filter(p => p.supplierId === this.user.id);
+            }
+
+            saveProducts() {
+                const allProducts = JSON.parse(localStorage.getItem('nsg_products') || '[]');
+                const otherProducts = allProducts.filter(p => p.supplierId !== this.user.id);
+                const updatedProducts = [...otherProducts, ...this.products];
+                localStorage.setItem('nsg_products', JSON.stringify(updatedProducts));
+            }
+
+            loadOrders() {
+                const allOrders = JSON.parse(localStorage.getItem('nsg_orders') || '[]');
+                return allOrders.filter(o => o.supplierId === this.user.id);
+            }
+
+            isThisMonth(dateString) {
+                const date = new Date(dateString);
+                const now = new Date();
+                return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+            }
+
+            getOrderStatusColor(status) {
+                const colors = {
+                    'pending': 'yellow',
+                    'processing': 'blue',
+                    'shipped': 'purple',
+                    'delivered': 'green',
+                    'completed': 'green',
+                    'cancelled': 'red'
+                };
+                return colors[status] || 'gray';
+            }
+
+            getActivityIcon(action) {
+                const icons = {
+                    'login': 'sign-in-alt',
+                    'product_added': 'plus-circle',
+                    'product_updated': 'edit',
+                    'order_processed': 'shopping-cart',
+                    'inventory_updated': 'boxes'
+                };
+                return icons[action] || 'activity';
+            }
+
+            getActivityDescription(activity) {
+                const descriptions = {
+                    'login': 'Signed in to medical rep portal',
+                    'product_added': `Added ${activity.details.productName} to catalog`,
+                    'product_updated': 'Updated product information',
+                    'order_processed': 'Processed customer order',
+                    'inventory_updated': 'Updated inventory levels'
+                };
+                return descriptions[activity.action] || 'Unknown activity';
+            }
+
+            formatDate(dateString) {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            formatCurrency(amount) {
+                return new Intl.NumberFormat('en-KE', {
+                    style: 'currency',
+                    currency: 'KES',
+                    minimumFractionDigits: 0
+                }).format(amount).replace('KES', '');
+            }
+        }
+
+        // Global functions
+        function openAddProductModal() {
+            document.getElementById('addProductModal').classList.remove('hidden');
+        }
+
+        function closeAddProductModal() {
+            medRepDashboard.closeAddProductModal();
+        }
+
+        function showInventory() {
+            showToast('Opening inventory manager...', 'info');
+        }
+
+        function showOrders() {
+            showToast('Opening orders manager...', 'info');
+        }
+
+        function showAnalytics() {
+            showToast('Opening analytics dashboard...', 'info');
+        }
+
+        function bulkInventoryUpdate() {
+            showToast('Bulk inventory update feature coming soon!', 'info');
+        }
+
+        function exportOrders() {
+            showToast('Export orders feature coming soon!', 'info');
+        }
+
+        function generateReport() {
+            showToast('Report generation feature coming soon!', 'info');
+        }
+
+        function contactSupport() {
+            window.open('mailto:docnsghealth@gmail.com?subject=Medical Rep Support Request', '_blank');
+        }
+
+        // Initialize dashboard
+        let medRepDashboard;
+        document.addEventListener('DOMContentLoaded', () => {
+            medRepDashboard = new MedRepDashboard();
+        });
+    </script>
+</body>
+</html>

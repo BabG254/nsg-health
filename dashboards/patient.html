@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - NSG Health</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="../logo.jpeg">
+    <link rel="shortcut icon" type="image/jpeg" href="../logo.jpeg">
+    <link rel="apple-touch-icon" href="../logo.jpeg">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sos-pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        
+        .service-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .appointment-card {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .prescription-card {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Top Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <svg width="32" height="28" viewBox="0 0 40 35" class="text-red-500">
+                                <path d="M20 32C20 32 3 22 3 12C3 7 7 3 12 3C15 3 18 5 20 8C22 5 25 3 28 3C33 3 37 7 37 12C37 22 20 32 20 32Z" fill="currentColor"/>
+                                <path d="M8 15L12 15L14 11L16 19L18 11L20 15L32 15" stroke="black" stroke-width="1.5" fill="none"/>
+                            </svg>
+                        </div>
+                        <div class="flex flex-col">
+                            <div class="flex items-baseline space-x-1">
+                                <span class="text-xl font-bold text-blue-600">NSG</span>
+                                <span class="text-xl font-bold text-blue-800">HEALTH</span>
+                            </div>
+                            <span class="text-xs text-blue-600 -mt-1">Patient Portal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <button class="relative p-2 text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-bell text-xl"></i>
+                        <span class="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">3</span>
+                    </button>
+
+                    <!-- User Menu -->
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-3 text-gray-700 hover:text-gray-900">
+                            <div id="userAvatar"></div>
+                            <div class="hidden sm:block text-left">
+                                <div id="userName" class="font-medium"></div>
+                                <div class="text-sm text-gray-500">Patient</div>
+                            </div>
+                            <i class="fas fa-chevron-down text-sm"></i>
+                        </button>
+                        
+                        <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-user mr-2"></i>Profile
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-cog mr-2"></i>Settings
+                            </a>
+                            <a href="../index.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-home mr-2"></i>Main Site
+                            </a>
+                            <div class="border-t border-gray-100"></div>
+                            <button onclick="nsgAuth.logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <div class="mb-8">
+            <h1 id="welcomeMessage" class="text-3xl font-bold text-gray-900 mb-2"></h1>
+            <p class="text-gray-600">Manage your health appointments, prescriptions, and emergency requests</p>
+        </div>
+
+        <!-- Emergency SOS Section -->
+        <div class="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-6 mb-8 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Emergency Assistance</h2>
+                    <p class="opacity-90">Need immediate medical help? Click the SOS button to alert nearby practitioners</p>
+                </div>
+                <button id="sosButton" class="sos-pulse bg-white text-red-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>SOS
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Book Appointment -->
+            <div class="service-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="openBookingModal()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Book Appointment</h3>
+                        <p class="text-sm opacity-90">Schedule with practitioners</p>
+                    </div>
+                    <i class="fas fa-calendar-plus text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- View Prescriptions -->
+            <div class="prescription-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showPrescriptions()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Prescriptions</h3>
+                        <p class="text-sm opacity-90">View active prescriptions</p>
+                    </div>
+                    <i class="fas fa-pills text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Order Medicine -->
+            <div class="stat-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="window.open('../index.html#medicine', '_blank')">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Order Medicine</h3>
+                        <p class="text-sm opacity-90">Browse pharmacy catalog</p>
+                    </div>
+                    <i class="fas fa-shopping-cart text-3xl opacity-75"></i>
+                </div>
+            </div>
+
+            <!-- Medical Records -->
+            <div class="appointment-card card-hover text-white rounded-lg p-6 cursor-pointer" onclick="showMedicalRecords()">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-2">Medical Records</h3>
+                        <p class="text-sm opacity-90">View your health history</p>
+                    </div>
+                    <i class="fas fa-file-medical text-3xl opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Column - Appointments & Prescriptions -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Upcoming Appointments -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">Upcoming Appointments</h3>
+                        <button onclick="openBookingModal()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            + Book New
+                        </button>
+                    </div>
+                    <div id="appointmentsList" class="space-y-3">
+                        <!-- Appointments will be loaded here -->
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-calendar-check text-4xl mb-3"></i>
+                            <p>No upcoming appointments</p>
+                            <button onclick="openBookingModal()" class="mt-2 text-blue-600 hover:text-blue-800">Book your first appointment</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                    <div id="activityList" class="space-y-3">
+                        <!-- Activities will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Health Stats & Quick Info -->
+            <div class="space-y-6">
+                <!-- Health Stats -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Health Summary</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Active Prescriptions</span>
+                            <span id="activePrescriptions" class="font-semibold text-blue-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Completed Visits</span>
+                            <span id="completedVisits" class="font-semibold text-green-600">0</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Emergency Requests</span>
+                            <span id="emergencyRequests" class="font-semibold text-red-600">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Contacts -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Emergency Contacts</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-red-800">NSG Health Emergency</div>
+                                <div class="text-sm text-red-600">24/7 Medical Response</div>
+                            </div>
+                            <a href="tel:+254700894381" class="text-red-600 hover:text-red-800">
+                                <i class="fas fa-phone text-xl"></i>
+                            </a>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div>
+                                <div class="font-medium text-green-800">WhatsApp Support</div>
+                                <div class="text-sm text-green-600">Quick messaging</div>
+                            </div>
+                            <a href="https://wa.me/254700894381" class="text-green-600 hover:text-green-800">
+                                <i class="fab fa-whatsapp text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-4">Quick Links</h3>
+                    <div class="space-y-2">
+                        <a href="../index.html#services" class="block p-2 text-blue-600 hover:bg-blue-50 rounded">
+                            <i class="fas fa-stethoscope mr-2"></i>Browse Services
+                        </a>
+                        <a href="../index.html#catalogue" class="block p-2 text-blue-600 hover:bg-blue-50 rounded">
+                            <i class="fas fa-medkit mr-2"></i>Medical Supplies
+                        </a>
+                        <a href="../index.html#blogs" class="block p-2 text-blue-600 hover:bg-blue-50 rounded">
+                            <i class="fas fa-blog mr-2"></i>Health Blog
+                        </a>
+                        <a href="../index.html#contact" class="block p-2 text-blue-600 hover:bg-blue-50 rounded">
+                            <i class="fas fa-phone mr-2"></i>Contact Support
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg w-full max-w-lg mx-4 max-h-90vh overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold">Book Appointment</h3>
+                    <button onclick="closeBookingModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="quickBookingForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Service Type</label>
+                        <select name="service" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Select a service</option>
+                            <option value="Medical Consultation">Medical Consultation</option>
+                            <option value="Medical Attention">Medical Attention</option>
+                            <option value="Therapy">Therapy</option>
+                            <option value="Family Physician">Family Physician</option>
+                            <option value="Personal Physician">Personal Physician</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Date</label>
+                            <input type="date" name="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Time</label>
+                            <input type="time" name="time" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Location</label>
+                        <input type="text" name="location" placeholder="Your address or preferred location" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Additional Notes</label>
+                        <textarea name="notes" rows="3" placeholder="Any special requirements or symptoms" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    
+                    <div class="flex gap-3 pt-4">
+                        <button type="button" onclick="closeBookingModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Book Appointment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOS Modal -->
+    <div id="sosModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg w-full max-w-md mx-4">
+            <div class="p-6">
+                <div class="text-center mb-4">
+                    <div class="bg-red-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-red-600">Emergency Request</h3>
+                    <p class="text-gray-600 mt-2">Alert nearby practitioners and emergency services</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Emergency Type</label>
+                        <select id="emergencyType" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <option value="medical">Medical Emergency</option>
+                            <option value="accident">Accident</option>
+                            <option value="respiratory">Breathing Problems</option>
+                            <option value="cardiac">Chest Pain</option>
+                            <option value="trauma">Physical Injury</option>
+                            <option value="other">Other Emergency</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Brief Description</label>
+                        <textarea id="emergencyDescription" rows="3" placeholder="Describe the emergency situation" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
+                    </div>
+                    
+                    <div id="locationStatus" class="p-3 bg-blue-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-spinner fa-spin text-blue-600 mr-2"></i>
+                            <span class="text-blue-800">Getting your location...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 pt-6">
+                    <button onclick="closeSosModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-400 transition-colors">
+                        Cancel
+                    </button>
+                    <button id="sendSosBtn" class="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700 transition-colors" disabled>
+                        <i class="fas fa-exclamation-triangle mr-2"></i>Send SOS
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../auth.js"></script>
+    <script src="../sos.js"></script>
+    <script src="dashboard.js"></script>
+    <script>
+        // Patient Dashboard specific functionality
+        class PatientDashboard {
+            constructor() {
+                this.user = nsgAuth.getCurrentUser();
+                this.appointments = this.loadAppointments();
+                this.prescriptions = this.loadPrescriptions();
+                this.initDashboard();
+            }
+
+            initDashboard() {
+                if (!this.user) {
+                    window.location.href = '../signin.html';
+                    return;
+                }
+
+                this.setupUserInfo();
+                this.setupEventListeners();
+                this.loadDashboardData();
+                this.setupBookingForm();
+                this.setupSOS();
+            }
+
+            setupUserInfo() {
+                document.getElementById('userName').textContent = nsgAuth.getDisplayName(this.user);
+                document.getElementById('userAvatar').innerHTML = nsgAuth.getUserAvatar(this.user);
+                document.getElementById('welcomeMessage').textContent = `Welcome back, ${this.user.firstName}!`;
+
+                // Setup user menu toggle
+                document.getElementById('userMenuBtn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('userMenu').classList.toggle('hidden');
+                });
+
+                // Close user menu when clicking outside
+                document.addEventListener('click', () => {
+                    document.getElementById('userMenu').classList.add('hidden');
+                });
+            }
+
+            setupEventListeners() {
+                // SOS Button
+                document.getElementById('sosButton').addEventListener('click', () => {
+                    this.initiateSOS();
+                });
+
+                // Set minimum date for appointment booking
+                const dateInput = document.querySelector('input[name="date"]');
+                if (dateInput) {
+                    const today = new Date().toISOString().split('T')[0];
+                    dateInput.setAttribute('min', today);
+                }
+            }
+
+            loadDashboardData() {
+                this.updateHealthStats();
+                this.loadRecentActivity();
+                this.displayUpcomingAppointments();
+            }
+
+            updateHealthStats() {
+                const activePrescriptions = this.prescriptions.filter(p => p.status === 'active').length;
+                const completedVisits = this.appointments.filter(a => a.status === 'completed').length;
+                const emergencyRequests = this.getEmergencyRequests().length;
+
+                document.getElementById('activePrescriptions').textContent = activePrescriptions;
+                document.getElementById('completedVisits').textContent = completedVisits;
+                document.getElementById('emergencyRequests').textContent = emergencyRequests;
+            }
+
+            loadRecentActivity() {
+                const activities = nsgAuth.getUserActivities(this.user.id, 5);
+                const activityList = document.getElementById('activityList');
+
+                if (activities.length === 0) {
+                    activityList.innerHTML = `
+                        <div class="text-center py-4 text-gray-500">
+                            <i class="fas fa-history text-2xl mb-2"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                activityList.innerHTML = activities.map(activity => `
+                    <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-${this.getActivityIcon(activity.action)} text-blue-600 text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm font-medium text-gray-900">${this.getActivityDescription(activity)}</div>
+                            <div class="text-xs text-gray-500">${this.formatDate(activity.timestamp)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            displayUpcomingAppointments() {
+                const upcomingAppointments = this.appointments
+                    .filter(apt => apt.status === 'scheduled' && new Date(apt.date) >= new Date())
+                    .sort((a, b) => new Date(a.date) - new Date(b.date))
+                    .slice(0, 3);
+
+                const appointmentsList = document.getElementById('appointmentsList');
+
+                if (upcomingAppointments.length === 0) {
+                    appointmentsList.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-calendar-check text-4xl mb-3"></i>
+                            <p>No upcoming appointments</p>
+                            <button onclick="openBookingModal()" class="mt-2 text-blue-600 hover:text-blue-800">Book your first appointment</button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                appointmentsList.innerHTML = upcomingAppointments.map(apt => `
+                    <div class="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                                <i class="fas fa-user-md text-blue-600"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium text-blue-900">${apt.service}</div>
+                                <div class="text-sm text-blue-700">${this.formatDate(apt.date)} at ${apt.time}</div>
+                                <div class="text-xs text-blue-600">${apt.location}</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="inline-block px-2 py-1 bg-blue-200 text-blue-800 rounded-full text-xs font-medium">
+                                ${apt.status}
+                            </span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            setupBookingForm() {
+                document.getElementById('quickBookingForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.submitBooking(e.target);
+                });
+            }
+
+            submitBooking(form) {
+                const formData = new FormData(form);
+                const bookingData = {
+                    id: 'apt_' + Date.now(),
+                    patientId: this.user.id,
+                    patientName: nsgAuth.getDisplayName(this.user),
+                    patientEmail: this.user.email,
+                    patientPhone: this.user.phone,
+                    service: formData.get('service'),
+                    date: formData.get('date'),
+                    time: formData.get('time'),
+                    location: formData.get('location'),
+                    notes: formData.get('notes'),
+                    status: 'scheduled',
+                    createdAt: new Date().toISOString()
+                };
+
+                // Add to appointments
+                this.appointments.push(bookingData);
+                this.saveAppointments();
+
+                // Log activity
+                nsgAuth.logActivity('appointment_booked', {
+                    service: bookingData.service,
+                    date: bookingData.date,
+                    appointmentId: bookingData.id
+                });
+
+                // Send email (demo)
+                this.sendBookingEmail(bookingData);
+
+                // Show success and close modal
+                showToast('Appointment booked successfully!', 'success');
+                this.closeBookingModal();
+                form.reset();
+
+                // Refresh dashboard
+                this.loadDashboardData();
+            }
+
+            sendBookingEmail(bookingData) {
+                const subject = `Appointment Booking - ${bookingData.service}`;
+                const body = `Dear NSG Health Team,%0D%0A%0D%0ANew appointment booking from the patient portal:%0D%0A%0D%0APatient: ${bookingData.patientName}%0D%0AEmail: ${bookingData.patientEmail}%0D%0APhone: ${bookingData.patientPhone}%0D%0AService: ${bookingData.service}%0D%0ADate: ${bookingData.date}%0D%0ATime: ${bookingData.time}%0D%0ALocation: ${encodeURIComponent(bookingData.location)}%0D%0ANotes: ${encodeURIComponent(bookingData.notes || 'None')}%0D%0A%0D%0ABooking ID: ${bookingData.id}%0D%0A%0D%0APlease confirm this appointment.`;
+                
+                window.open(`mailto:docnsghealth@gmail.com?subject=${encodeURIComponent(subject)}&body=${body}`, '_blank');
+            }
+
+            setupSOS() {
+                // SOS functionality is handled by sos.js
+                if (window.sosSystem) {
+                    window.sosSystem.onLocationUpdate = (location) => {
+                        document.getElementById('locationStatus').innerHTML = `
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-green-600 mr-2"></i>
+                                <span class="text-green-800">Location detected: ${location.address || 'Current location'}</span>
+                            </div>
+                        `;
+                        document.getElementById('sendSosBtn').disabled = false;
+                    };
+
+                    window.sosSystem.onLocationError = (error) => {
+                        document.getElementById('locationStatus').innerHTML = `
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                                <span class="text-red-800">Location access denied. You can still send SOS.</span>
+                            </div>
+                        `;
+                        document.getElementById('sendSosBtn').disabled = false;
+                    };
+                }
+            }
+
+            initiateSOS() {
+                document.getElementById('sosModal').classList.remove('hidden');
+                document.getElementById('locationStatus').innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-spinner fa-spin text-blue-600 mr-2"></i>
+                        <span class="text-blue-800">Getting your location...</span>
+                    </div>
+                `;
+                document.getElementById('sendSosBtn').disabled = true;
+
+                // Get location
+                if (window.sosSystem) {
+                    window.sosSystem.getCurrentLocation();
+                }
+            }
+
+            // Utility methods
+            loadAppointments() {
+                const appointments = JSON.parse(localStorage.getItem('nsg_appointments') || '[]');
+                return appointments.filter(apt => apt.patientId === this.user.id);
+            }
+
+            saveAppointments() {
+                const allAppointments = JSON.parse(localStorage.getItem('nsg_appointments') || '[]');
+                const otherAppointments = allAppointments.filter(apt => apt.patientId !== this.user.id);
+                const updatedAppointments = [...otherAppointments, ...this.appointments];
+                localStorage.setItem('nsg_appointments', JSON.stringify(updatedAppointments));
+            }
+
+            loadPrescriptions() {
+                const prescriptions = JSON.parse(localStorage.getItem('nsg_prescriptions') || '[]');
+                return prescriptions.filter(presc => presc.patientId === this.user.id);
+            }
+
+            getEmergencyRequests() {
+                const emergencies = JSON.parse(localStorage.getItem('nsg_emergencies') || '[]');
+                return emergencies.filter(em => em.patientId === this.user.id);
+            }
+
+            getActivityIcon(action) {
+                const icons = {
+                    'login': 'sign-in-alt',
+                    'appointment_booked': 'calendar-plus',
+                    'sos_sent': 'exclamation-triangle',
+                    'prescription_viewed': 'pills',
+                    'profile_updated': 'user-edit'
+                };
+                return icons[action] || 'activity';
+            }
+
+            getActivityDescription(activity) {
+                const descriptions = {
+                    'login': 'Signed in to patient portal',
+                    'appointment_booked': `Booked ${activity.details.service} appointment`,
+                    'sos_sent': 'Sent emergency SOS request',
+                    'prescription_viewed': 'Viewed prescriptions',
+                    'profile_updated': 'Updated profile information'
+                };
+                return descriptions[activity.action] || 'Unknown activity';
+            }
+
+            formatDate(dateString) {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            closeBookingModal() {
+                document.getElementById('bookingModal').classList.add('hidden');
+            }
+        }
+
+        // Global functions for buttons
+        function openBookingModal() {
+            document.getElementById('bookingModal').classList.remove('hidden');
+        }
+
+        function closeBookingModal() {
+            patientDashboard.closeBookingModal();
+        }
+
+        function closeSosModal() {
+            document.getElementById('sosModal').classList.add('hidden');
+        }
+
+        function showPrescriptions() {
+            showToast('Prescriptions feature coming soon!', 'info');
+        }
+
+        function showMedicalRecords() {
+            showToast('Medical records feature coming soon!', 'info');
+        }
+
+        // Initialize dashboard
+        let patientDashboard;
+        document.addEventListener('DOMContentLoaded', () => {
+            patientDashboard = new PatientDashboard();
+        });
+    </script>
+</body>
+</html>
